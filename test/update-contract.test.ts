@@ -9,39 +9,48 @@ import {
 } from "../src/generated/releases.ts";
 import worker from "../src/index.ts";
 
+const updateAssets = latestRelease.assets as Record<
+  string,
+  {
+    updateSha256?: string;
+    updateUrl: string;
+  }
+>;
+
 function request(pathname: string): Request {
   return new Request(`https://updates.hucode.dev${pathname}`);
 }
 
 describe("update fallback", () => {
-  test("returns no update for a valid Darwin request", async () => {
-    const response = worker.fetch(request("/api/update/darwin/stable/abc123"));
+  test("returns no update for valid platform requests", async () => {
+    for (const platform of validPlatforms) {
+      const response = worker.fetch(
+        request(`/api/update/${platform}/stable/abc123`),
+      );
 
-    assert.equal(response.status, 204);
-    assert.equal(response.headers.get("Cache-Control"), "public, max-age=300");
-    assert.equal(await response.text(), "");
+      assert.equal(response.status, 204);
+      assert.equal(
+        response.headers.get("Cache-Control"),
+        "public, max-age=300",
+      );
+      assert.equal(await response.text(), "");
+    }
   });
 
-  test("returns no update for a valid Darwin arm64 request", () => {
-    const response = worker.fetch(
-      request("/api/update/darwin-arm64/stable/abc123"),
-    );
+  test("rejects invalid update paths", () => {
+    const invalidPaths = [
+      "/api/update/linux-x64/stable/abc123",
+      "/api/update/darwin/insider/abc123",
+      "/api/update/darwin/stable",
+      "/api/update/darwin/stable/abc123/extra",
+      "/api/releases/current.json",
+    ];
 
-    assert.equal(response.status, 204);
-  });
+    for (const pathname of invalidPaths) {
+      const response = worker.fetch(request(pathname));
 
-  test("rejects unsupported platforms", () => {
-    const response = worker.fetch(
-      request("/api/update/linux-x64/stable/abc123"),
-    );
-
-    assert.equal(response.status, 404);
-  });
-
-  test("rejects unsupported qualities", () => {
-    const response = worker.fetch(request("/api/update/darwin/insider/abc123"));
-
-    assert.equal(response.status, 404);
+      assert.equal(response.status, 404);
+    }
   });
 });
 
@@ -53,18 +62,37 @@ describe("generated update assets", () => {
   });
 
   test("generates static update responses for older commits", async () => {
-    const olderRelease = releases.find((release) => release.tag === "v0.0.19");
-    assert.ok(olderRelease);
+    for (const release of releases.slice(1)) {
+      for (const platform of validPlatforms) {
+        const responsePath = `public/api/update/${platform}/stable/${release.commit}`;
+        const response = JSON.parse(
+          await fs.readFile(responsePath, "utf8"),
+        ) as {
+          productVersion?: string;
+          sha256hash?: string;
+          timestamp?: number;
+          url?: string;
+          version?: string;
+        };
+        const updateAsset = updateAssets[platform];
+        assert.ok(updateAsset);
 
-    const responsePath = `public/api/update/darwin/stable/${olderRelease.commit}`;
-    const response = JSON.parse(await fs.readFile(responsePath, "utf8")) as {
-      productVersion?: string;
-      url?: string;
-      version?: string;
-    };
+        assert.equal(response.productVersion, latestRelease.version);
+        assert.equal(response.version, latestRelease.commit);
+        assert.equal(response.url, updateAsset.updateUrl);
+        assert.equal(response.sha256hash, updateAsset.updateSha256);
+        assert.equal(response.timestamp, Date.parse(latestRelease.publishedAt));
+      }
+    }
+  });
 
-    assert.equal(response.productVersion, latestRelease.version);
-    assert.equal(response.version, latestRelease.commit);
-    assert.equal(response.url, latestRelease.assets.darwin.updateUrl);
+  test("does not generate static update responses for the latest commit", async () => {
+    for (const platform of validPlatforms) {
+      await assert.rejects(
+        fs.access(
+          `public/api/update/${platform}/stable/${latestRelease.commit}`,
+        ),
+      );
+    }
   });
 });
