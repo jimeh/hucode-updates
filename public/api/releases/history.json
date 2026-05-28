@@ -1,0 +1,33 @@
+[
+  {
+    "assets": {
+      "darwin-arm64": {
+        "updateUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.20/hucode-darwin-arm64.zip",
+        "updateSha256": "52c8729761a279e1065badd7325f61c5b25425b99f68ea2d69f737c9cc7e2548",
+        "updateSize": 246737997,
+        "downloadUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.20/hucode-darwin-arm64.dmg",
+        "downloadSha256": "5784077f8e8243f869edecb074e4976a36d0daa4487f7126de717b3c7709817f",
+        "downloadSize": 180696817
+      },
+      "darwin": {
+        "updateUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.20/hucode-darwin-x64.zip",
+        "updateSha256": "d93c94f58472d64ff75d9d635c324863318d6197b446dad316c2470792cf36d7",
+        "updateSize": 256163615,
+        "downloadUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.20/hucode-darwin-x64.dmg",
+        "downloadSha256": "1178b12c44177fe3129a8826d0996407d7accc93ccbdc25b8a179bced814e41d",
+        "downloadSize": 194573444
+      }
+    },
+    "commit": "06f666744e3312d81e281b4afc9844b0226774f6",
+    "publishedAt": "2026-05-28T20:47:29Z",
+    "tag": "v0.0.20",
+    "version": "0.0.20"
+  },
+  {
+    "assets": {},
+    "commit": "17f2c1bc4e5dad92df0be886c6cf4f1f5a0ccdeb",
+    "publishedAt": "2026-05-26T20:50:16Z",
+    "tag": "v0.0.19",
+    "version": "0.0.19"
+  }
+]
