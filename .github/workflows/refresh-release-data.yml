@@ -1,0 +1,98 @@
+name: Refresh release data
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types:
+      - hucode-release-published
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-release-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    name: Refresh release data
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
+        with:
+          version: 11.1.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Refresh release metadata
+        run: pnpm refresh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Check
+        run: pnpm check
+
+      - name: Read refreshed release
+        id: release
+        run: |
+          tag="$(
+            node -e "const fs = require('node:fs'); process.stdout.write(JSON.parse(fs.readFileSync('public/api/releases/current.json', 'utf8')).tag)"
+          )"
+          echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
+
+      - name: Verify refreshed files
+        run: |
+          set -euo pipefail
+
+          changed="$(
+            {
+              git diff --name-only
+              git ls-files --others --exclude-standard
+            } | sort -u
+          )"
+
+          if [ -z "${changed}" ]; then
+            exit 0
+          fi
+
+          unexpected=""
+
+          while IFS= read -r path; do
+            case "${path}" in
+              public/api/releases/* | public/api/update/*)
+                ;;
+              src/generated/releases.ts)
+                ;;
+              *)
+                unexpected="${unexpected}${path}"$'\n'
+                ;;
+            esac
+          done <<< "${changed}"
+
+          if [ -n "${unexpected}" ]; then
+            echo "${unexpected}"
+            exit 1
+          fi
+
+      - name: Stage refreshed data
+        run: git add public/api/releases public/api/update src/generated/releases.ts
+
+      - name: Commit refreshed data
+        uses: grafana/github-api-commit-action@b1d81091e8480dd11fcea8bc1f0ab977a0376ca5 # v1.0.0
+        with:
+          commit-message: "chore: refresh Hucode update metadata for ${{ steps.release.outputs.tag }}"
+          success-if-no-changes: true
+          token: ${{ github.token }}
