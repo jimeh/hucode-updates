@@ -146,17 +146,25 @@ export function downloadPlatform(assetName: string): string | undefined {
   return undefined;
 }
 
-async function fetchJson<T>(url: string): Promise<T> {
+/**
+ * Builds GitHub API headers, using GITHUB_TOKEN when available.
+ */
+export function githubHeaders(token = process.env.GITHUB_TOKEN): Headers {
   const headers = new Headers({
     Accept: "application/vnd.github+json",
     "User-Agent": "hucode-updates",
     "X-GitHub-Api-Version": "2022-11-28",
   });
 
-  if (process.env.GITHUB_TOKEN) {
-    headers.set("Authorization", `Bearer ${process.env.GITHUB_TOKEN}`);
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
   }
 
+  return headers;
+}
+
+async function fetchJson<T>(url: string): Promise<T> {
+  const headers = githubHeaders();
   const response = await fetch(url, { headers });
   if (!response.ok) {
     throw new Error(`${url} returned ${response.status}`);

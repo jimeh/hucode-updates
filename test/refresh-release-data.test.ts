@@ -6,6 +6,7 @@ import { describe, test } from "node:test";
 
 import {
   downloadPlatform,
+  githubHeaders,
   platformAssets,
   releaseVersion,
   refresh,
@@ -48,6 +49,20 @@ describe("release metadata parsing", () => {
     );
     assert.equal(sha256(undefined), undefined);
     assert.equal(sha256("sha512:abcdef"), undefined);
+  });
+});
+
+describe("GitHub API headers", () => {
+  test("uses GITHUB_TOKEN as a bearer token when provided", () => {
+    const headers = githubHeaders("github-token");
+
+    assert.equal(headers.get("Authorization"), "Bearer github-token");
+  });
+
+  test("omits authorization for unauthenticated requests", () => {
+    const headers = githubHeaders("");
+
+    assert.equal(headers.get("Authorization"), null);
   });
 });
 

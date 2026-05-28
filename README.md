@@ -32,6 +32,8 @@ pnpm deploy
 
 `pnpm refresh` fetches GitHub release metadata, updates the generated release
 manifest, and writes static update responses for older known release commits.
+Set `GITHUB_TOKEN` when running it locally to use authenticated GitHub API
+requests and avoid lower unauthenticated rate limits.
 `pnpm check` runs linting, formatting checks, type checks, and tests.
 
 ## Release Refresh
