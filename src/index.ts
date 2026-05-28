@@ -12,14 +12,17 @@ const NO_UPDATE_HEADERS = {
 function isValidUpdateRequest(pathname: string): boolean {
   const match = UPDATE_PATH.exec(pathname);
   const groups = match?.groups;
-  const platform = groups?.platform;
+  if (!groups) {
+    return false;
+  }
+
+  const { commit, platform, quality } = groups;
 
   return Boolean(
     platform &&
-      groups &&
-      VALID_PLATFORMS.has(platform) &&
-      groups.quality === VALID_QUALITY &&
-      groups.commit,
+    VALID_PLATFORMS.has(platform) &&
+    quality === VALID_QUALITY &&
+    commit,
   );
 }
 
@@ -27,7 +30,7 @@ function isValidUpdateRequest(pathname: string): boolean {
  * Cloudflare Worker fallback for update paths not served as static assets.
  */
 export default {
-  async fetch(request: Request): Promise<Response> {
+  fetch(request: Request): Response {
     const url = new URL(request.url);
 
     if (!isValidUpdateRequest(url.pathname)) {

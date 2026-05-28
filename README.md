@@ -23,6 +23,8 @@ seven days.
 mise install
 pnpm install
 pnpm refresh
+pnpm lint
+pnpm format
 pnpm check
 pnpm dev
 pnpm deploy
@@ -30,6 +32,7 @@ pnpm deploy
 
 `pnpm refresh` fetches GitHub release metadata, updates the generated release
 manifest, and writes static update responses for older known release commits.
+`pnpm check` runs linting, formatting checks, type checks, and tests.
 
 ## Release Refresh
 

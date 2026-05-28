@@ -8,16 +8,26 @@
     "node": ">=22"
   },
   "scripts": {
-    "check": "pnpm typecheck && pnpm test",
+    "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test",
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
+    "format": "prettier --write \"**/*.{ts,json,jsonc,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,json,jsonc,md,yml,yaml}\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prepare": "lefthook install",
     "refresh": "node --experimental-strip-types scripts/refresh-release-data.ts",
     "test": "node --test --experimental-strip-types test/**/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^24.0.0",
-    "typescript": "^5.9.0",
+    "eslint": "^10.4.0",
+    "lefthook": "^2.1.8",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "8.59.4",
     "wrangler": "^4.0.0"
   }
 }

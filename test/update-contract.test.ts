@@ -15,38 +15,31 @@ function request(pathname: string): Request {
 
 describe("update fallback", () => {
   test("returns no update for a valid Darwin request", async () => {
-    const response = await worker.fetch(
-      request("/api/update/darwin/stable/abc123"),
-    );
+    const response = worker.fetch(request("/api/update/darwin/stable/abc123"));
 
     assert.equal(response.status, 204);
-    assert.equal(
-      response.headers.get("Cache-Control"),
-      "public, max-age=300",
-    );
+    assert.equal(response.headers.get("Cache-Control"), "public, max-age=300");
     assert.equal(await response.text(), "");
   });
 
-  test("returns no update for a valid Darwin arm64 request", async () => {
-    const response = await worker.fetch(
+  test("returns no update for a valid Darwin arm64 request", () => {
+    const response = worker.fetch(
       request("/api/update/darwin-arm64/stable/abc123"),
     );
 
     assert.equal(response.status, 204);
   });
 
-  test("rejects unsupported platforms", async () => {
-    const response = await worker.fetch(
+  test("rejects unsupported platforms", () => {
+    const response = worker.fetch(
       request("/api/update/linux-x64/stable/abc123"),
     );
 
     assert.equal(response.status, 404);
   });
 
-  test("rejects unsupported qualities", async () => {
-    const response = await worker.fetch(
-      request("/api/update/darwin/insider/abc123"),
-    );
+  test("rejects unsupported qualities", () => {
+    const response = worker.fetch(request("/api/update/darwin/insider/abc123"));
 
     assert.equal(response.status, 404);
   });
@@ -63,8 +56,7 @@ describe("generated update assets", () => {
     const olderRelease = releases.find((release) => release.tag === "v0.0.19");
     assert.ok(olderRelease);
 
-    const responsePath =
-      `public/api/update/darwin/stable/${olderRelease.commit}`;
+    const responsePath = `public/api/update/darwin/stable/${olderRelease.commit}`;
     const response = JSON.parse(await fs.readFile(responsePath, "utf8")) as {
       productVersion?: string;
       url?: string;
@@ -73,9 +65,6 @@ describe("generated update assets", () => {
 
     assert.equal(response.productVersion, latestRelease.version);
     assert.equal(response.version, latestRelease.commit);
-    assert.equal(
-      response.url,
-      latestRelease.assets.darwin.updateUrl,
-    );
+    assert.equal(response.url, latestRelease.assets.darwin.updateUrl);
   });
 });

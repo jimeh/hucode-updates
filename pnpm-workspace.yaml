@@ -2,5 +2,6 @@ minimumReleaseAge: 10080
 
 allowBuilds:
   esbuild@0.27.3: true
+  lefthook@2.1.8: true
   sharp@0.34.5: true
   workerd@1.20260520.1: true
