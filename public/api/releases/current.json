@@ -1,24 +1,24 @@
 {
   "assets": {
     "darwin-arm64": {
-      "updateUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.20/hucode-darwin-arm64.zip",
-      "updateSha256": "52c8729761a279e1065badd7325f61c5b25425b99f68ea2d69f737c9cc7e2548",
-      "updateSize": 246737997,
-      "downloadUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.20/hucode-darwin-arm64.dmg",
-      "downloadSha256": "5784077f8e8243f869edecb074e4976a36d0daa4487f7126de717b3c7709817f",
-      "downloadSize": 180696817
+      "updateUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.21/hucode-darwin-arm64.zip",
+      "updateSha256": "56c8c216f0703b18f53fcc6827d14eec81c2b8a0d6d7d959ef548b13d993e9ca",
+      "updateSize": 246767852,
+      "downloadUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.21/hucode-darwin-arm64.dmg",
+      "downloadSha256": "3cc7b20e17619c2ce41536fb18dd793a28d1fa7abeb713b93ef7b82fa6fd05f1",
+      "downloadSize": 180562117
     },
     "darwin": {
-      "updateUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.20/hucode-darwin-x64.zip",
-      "updateSha256": "d93c94f58472d64ff75d9d635c324863318d6197b446dad316c2470792cf36d7",
-      "updateSize": 256163615,
-      "downloadUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.20/hucode-darwin-x64.dmg",
-      "downloadSha256": "1178b12c44177fe3129a8826d0996407d7accc93ccbdc25b8a179bced814e41d",
-      "downloadSize": 194573444
+      "updateUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.21/hucode-darwin-x64.zip",
+      "updateSha256": "b649d38cca550c652cae4426d6896faca4d01018a0fed468853867299c61ec47",
+      "updateSize": 256206690,
+      "downloadUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.21/hucode-darwin-x64.dmg",
+      "downloadSha256": "43906f75c4d3366d97daf3fd5fad1b26bc827dd4d0cb6b72b21e57914475e3de",
+      "downloadSize": 194818079
     }
   },
-  "commit": "06f666744e3312d81e281b4afc9844b0226774f6",
-  "publishedAt": "2026-05-28T20:47:29Z",
-  "tag": "v0.0.20",
-  "version": "0.0.20"
+  "commit": "df3fa28c5274f23d5d826850886f632668c29a93",
+  "publishedAt": "2026-05-29T03:36:51Z",
+  "tag": "v0.0.21",
+  "version": "0.0.21"
 }
