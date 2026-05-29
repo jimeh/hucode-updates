@@ -57,8 +57,8 @@ describe("update fallback", () => {
 describe("generated update assets", () => {
   test("derives valid platforms from latest release ZIP assets", () => {
     assert.deepEqual([...validPlatforms].sort(), ["darwin", "darwin-arm64"]);
-    assert.equal(latestRelease.tag, "v0.0.20");
-    assert.equal(latestRelease.version, "0.0.20");
+    assert.match(latestRelease.version, /^\d+\.\d+\.\d+$/);
+    assert.equal(latestRelease.tag, `v${latestRelease.version}`);
   });
 
   test("generates static update responses for older commits", async () => {
