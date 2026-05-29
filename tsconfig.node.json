@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     "allowImportingTsExtensions": true,
-    "lib": ["ES2022", "WebWorker"],
+    "lib": ["ES2022"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "noEmit": true,
     "noUncheckedIndexedAccess": true,
     "strict": true,
     "target": "ES2022",
-    "types": []
+    "types": ["node"]
   },
-  "include": ["src/**/*.ts"]
+  "include": ["scripts/**/*.ts", "test/**/*.ts"]
 }

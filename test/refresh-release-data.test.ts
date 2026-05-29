@@ -6,6 +6,7 @@ import { describe, test } from "node:test";
 
 import {
   downloadPlatform,
+  fetchGitHubReleases,
   githubHeaders,
   platformAssets,
   releaseVersion,
@@ -14,6 +15,7 @@ import {
   updatePlatform,
   updateResponse,
   type GitHubAsset,
+  type GitHubRelease,
   type Release,
 } from "../scripts/refresh-release-data.ts";
 
@@ -26,6 +28,20 @@ function asset(
     digest: options.digest,
     name,
     size: options.size ?? 123,
+  };
+}
+
+function githubRelease(
+  tag: string,
+  options: Partial<GitHubRelease> = {},
+): GitHubRelease {
+  return {
+    assets: [],
+    draft: false,
+    prerelease: false,
+    published_at: "2026-05-28T20:47:29Z",
+    tag_name: tag,
+    ...options,
   };
 }
 
@@ -63,6 +79,45 @@ describe("GitHub API headers", () => {
     const headers = githubHeaders("");
 
     assert.equal(headers.get("Authorization"), null);
+  });
+});
+
+describe("GitHub release fetching", () => {
+  test("fetches all release pages", async () => {
+    const originalFetch = globalThis.fetch;
+    const requestedUrls: string[] = [];
+    const firstPage = Array.from({ length: 100 }, (_, index) =>
+      githubRelease(`v1.0.${index}`),
+    );
+    const secondPage = [githubRelease("v0.9.0")];
+
+    const mockFetch: typeof fetch = (input) => {
+      if (typeof input !== "string") {
+        throw new TypeError("Expected fetch URL string.");
+      }
+
+      requestedUrls.push(input);
+
+      const url = new URL(input);
+      const page = url.searchParams.get("page");
+      const body = page === "1" ? firstPage : secondPage;
+
+      return Promise.resolve(new Response(JSON.stringify(body)));
+    };
+
+    globalThis.fetch = mockFetch;
+
+    try {
+      const releases = await fetchGitHubReleases();
+
+      assert.equal(releases.length, 101);
+      assert.deepEqual(requestedUrls, [
+        "https://api.github.com/repos/jimeh/hucode/releases?per_page=100&page=1",
+        "https://api.github.com/repos/jimeh/hucode/releases?per_page=100&page=2",
+      ]);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
   });
 });
 
@@ -154,6 +209,23 @@ describe("update response", () => {
 });
 
 describe("refresh pipeline", () => {
+  test("rejects a latest release with no update-capable assets", async () => {
+    const latest: Release = {
+      assets: {},
+      commit: "latest-commit",
+      publishedAt: "2026-05-28T20:47:29Z",
+      tag: "v1.2.3",
+      version: "1.2.3",
+    };
+
+    await assert.rejects(
+      refresh({
+        releaseProvider: () => Promise.resolve([latest]),
+      }),
+      /Latest release \(v1\.2\.3\) has no update-capable assets\./,
+    );
+  });
+
   test("writes generated metadata from an injected release provider", async () => {
     const root = await fs.mkdtemp(path.join(tmpdir(), "hucode-updates-"));
     const updateRoot = path.join(root, "update");

@@ -19,7 +19,7 @@ export type GitHubAsset = {
   size: number;
 };
 
-type GitHubRelease = {
+export type GitHubRelease = {
   assets: GitHubAsset[];
   draft: boolean;
   prerelease: boolean;
@@ -229,10 +229,29 @@ export function platformAssets(
   return platforms;
 }
 
+/**
+ * Fetches all GitHub releases for the upstream Hucode repository.
+ */
+export async function fetchGitHubReleases(): Promise<GitHubRelease[]> {
+  const githubReleases: GitHubRelease[] = [];
+
+  for (let page = 1; ; page += 1) {
+    const releasesPage = await fetchJson<GitHubRelease[]>(
+      `https://api.github.com/repos/${REPO}/releases?per_page=100&page=${page}`,
+    );
+
+    githubReleases.push(...releasesPage);
+
+    if (releasesPage.length < 100) {
+      break;
+    }
+  }
+
+  return githubReleases;
+}
+
 async function releases(): Promise<Release[]> {
-  const githubReleases = await fetchJson<GitHubRelease[]>(
-    `https://api.github.com/repos/${REPO}/releases?per_page=100`,
-  );
+  const githubReleases = await fetchGitHubReleases();
 
   const stable = githubReleases
     .filter((release) => !release.draft && !release.prerelease)
@@ -314,6 +333,11 @@ export async function refresh(options: RefreshOptions = {}): Promise<void> {
   }
 
   const latestPlatforms = Object.keys(latest.assets).sort();
+  if (latestPlatforms.length === 0) {
+    throw new Error(
+      `Latest release (${latest.tag}) has no update-capable assets.`,
+    );
+  }
 
   await fs.rm(updateRoot, { recursive: true, force: true });
   await fs.rm(releasesRoot, { recursive: true, force: true });

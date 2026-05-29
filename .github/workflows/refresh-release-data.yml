@@ -7,7 +7,7 @@ on:
       - hucode-release-published
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: refresh-release-data
@@ -18,10 +18,20 @@ jobs:
     name: Refresh release data
     runs-on: ubuntu-latest
     steps:
+      - name: Create release bot token
+        id: release-bot-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+          permission-contents: write
+
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          persist-credentials: false
           ref: ${{ github.ref_name }}
+          token: ${{ steps.release-bot-token.outputs.token }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
@@ -40,7 +50,7 @@ jobs:
       - name: Refresh release metadata
         run: pnpm refresh
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ steps.release-bot-token.outputs.token }}
 
       - name: Check
         run: pnpm check
@@ -95,4 +105,4 @@ jobs:
         with:
           commit-message: "chore: refresh Hucode update metadata for ${{ steps.release.outputs.tag }}"
           success-if-no-changes: true
-          token: ${{ github.token }}
+          token: ${{ steps.release-bot-token.outputs.token }}

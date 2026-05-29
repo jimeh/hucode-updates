@@ -18,7 +18,7 @@
     "prepare": "lefthook install",
     "refresh": "node --experimental-strip-types scripts/refresh-release-data.ts",
     "test": "node --test --experimental-strip-types test/**/*.test.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.node.json"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

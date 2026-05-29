@@ -52,4 +52,8 @@ The caller needs a token with write access to `jimeh/hucode-updates`.
 
 The workflow commits refreshed metadata with
 `grafana/github-api-commit-action`, so commits are created through GitHub's
-API and signed by GitHub when `GITHUB_TOKEN` is used.
+API and signed by GitHub. It mints a release bot GitHub App token from these
+repository settings:
+
+- Variable: `RELEASE_BOT_CLIENT_ID`
+- Secret: `RELEASE_BOT_PRIVATE_KEY`
