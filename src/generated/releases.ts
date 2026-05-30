@@ -5,6 +5,38 @@ export const releases = [
     assets: {
       "darwin-arm64": {
         updateUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.23/hucode-darwin-arm64.zip",
+        updateSha256:
+          "639219ae3aafc642c752042f124bd0fe767c73cc6b114ca27a9e8a595750f52f",
+        updateSize: 265689740,
+        downloadUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.23/hucode-darwin-arm64.dmg",
+        downloadSha256:
+          "351182a8eb00e0cf668e4158bbe401d34802d894b3c0d36b5d92659c0f61db79",
+        downloadSize: 194238503,
+      },
+      darwin: {
+        updateUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.23/hucode-darwin-x64.zip",
+        updateSha256:
+          "1668c3d2d50f28d2696076bad84ffe5d37ad91dac53cffedbd239f00affb6fb9",
+        updateSize: 275490649,
+        downloadUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.23/hucode-darwin-x64.dmg",
+        downloadSha256:
+          "3589fc990ceedcd87d13ee911e425fd42f001bb4b6ec8ed727abaedfd41efcc5",
+        downloadSize: 208938387,
+      },
+    },
+    commit: "7768e2a4797aeb58953d3d5dd5428d6c7146691b",
+    publishedAt: "2026-05-30T11:17:25Z",
+    tag: "v0.0.23",
+    version: "0.0.23",
+  },
+  {
+    assets: {
+      "darwin-arm64": {
+        updateUrl:
           "https://github.com/jimeh/hucode/releases/download/v0.0.22/hucode-darwin-arm64.zip",
         updateSha256:
           "62ac18a1619637425d5ff53b48d51ab89789f45faf6482c95a9cfd56bf5fe279",
