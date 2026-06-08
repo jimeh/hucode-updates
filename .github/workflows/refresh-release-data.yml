@@ -82,6 +82,8 @@ jobs:
 
           while IFS= read -r path; do
             case "${path}" in
+              public/release-notes/*)
+                ;;
               public/api/releases/* | public/api/update/*)
                 ;;
               src/generated/releases.ts)
@@ -98,7 +100,7 @@ jobs:
           fi
 
       - name: Stage refreshed data
-        run: git add public/api/releases public/api/update src/generated/releases.ts
+        run: git add public/api/releases public/api/update public/release-notes src/generated/releases.ts
 
       - name: Commit refreshed data
         uses: grafana/github-api-commit-action@b1d81091e8480dd11fcea8bc1f0ab977a0376ca5 # v1.0.0

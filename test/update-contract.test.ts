@@ -61,6 +61,14 @@ describe("generated update assets", () => {
     assert.equal(latestRelease.tag, `v${latestRelease.version}`);
   });
 
+  test("generates release notes for each known release", async () => {
+    for (const release of releases) {
+      const responsePath = `public/release-notes/${release.version}.md`;
+
+      await fs.access(responsePath);
+    }
+  });
+
   test("generates static update responses for older commits", async () => {
     for (const release of releases.slice(1)) {
       for (const platform of validPlatforms) {
