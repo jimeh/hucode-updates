@@ -31,10 +31,18 @@ pnpm deploy
 ```
 
 `pnpm refresh` fetches GitHub release metadata, updates the generated release
-manifest, and writes static update responses for older known release commits.
+manifest, writes static update responses for older known release commits, and
+writes per-version release notes from GitHub release bodies to
+`public/release-notes/{version}.md`.
 Set `GITHUB_TOKEN` when running it locally to use authenticated GitHub API
 requests and avoid lower unauthenticated rate limits.
 `pnpm check` runs linting, formatting checks, type checks, and tests.
+
+Release notes are served from static assets:
+
+```text
+https://updates.hucode.dev/release-notes/0.0.20.md
+```
 
 ## Release Refresh
 
@@ -57,3 +65,10 @@ repository settings:
 
 - Variable: `RELEASE_BOT_CLIENT_ID`
 - Secret: `RELEASE_BOT_PRIVATE_KEY`
+
+Manual backfill for existing releases uses the same refresh path:
+
+```sh
+GITHUB_TOKEN="$(gh auth token)" pnpm refresh
+pnpm check
+```

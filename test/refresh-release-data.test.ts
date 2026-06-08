@@ -17,6 +17,7 @@ import {
   type GitHubAsset,
   type GitHubRelease,
   type Release,
+  type ReleaseWithNotes,
 } from "../scripts/refresh-release-data.ts";
 
 function asset(
@@ -37,6 +38,7 @@ function githubRelease(
 ): GitHubRelease {
   return {
     assets: [],
+    body: null,
     draft: false,
     prerelease: false,
     published_at: "2026-05-28T20:47:29Z",
@@ -210,10 +212,11 @@ describe("update response", () => {
 
 describe("refresh pipeline", () => {
   test("rejects a latest release with no update-capable assets", async () => {
-    const latest: Release = {
+    const latest: ReleaseWithNotes = {
       assets: {},
       commit: "latest-commit",
       publishedAt: "2026-05-28T20:47:29Z",
+      releaseNotes: "",
       tag: "v1.2.3",
       version: "1.2.3",
     };
@@ -230,9 +233,10 @@ describe("refresh pipeline", () => {
     const root = await fs.mkdtemp(path.join(tmpdir(), "hucode-updates-"));
     const updateRoot = path.join(root, "update");
     const releasesRoot = path.join(root, "releases");
+    const releaseNotesRoot = path.join(root, "release-notes");
     const generatedSourcePath = path.join(root, "generated", "releases.ts");
 
-    const latest: Release = {
+    const latest: ReleaseWithNotes = {
       assets: {
         darwin: {
           updateUrl: "https://downloads.example.com/latest-darwin.zip",
@@ -243,13 +247,15 @@ describe("refresh pipeline", () => {
       },
       commit: "latest-commit",
       publishedAt: "2026-05-28T20:47:29Z",
+      releaseNotes: "## Latest\n\nLatest release notes.\n\n",
       tag: "v1.2.3",
       version: "1.2.3",
     };
-    const previous: Release = {
+    const previous: ReleaseWithNotes = {
       assets: {},
       commit: "previous-commit",
       publishedAt: "2026-05-27T20:47:29Z",
+      releaseNotes: "## Previous\n\nPrevious release notes.",
       tag: "v1.2.2",
       version: "1.2.2",
     };
@@ -257,6 +263,7 @@ describe("refresh pipeline", () => {
     await refresh({
       generatedSourcePath,
       releaseProvider: () => Promise.resolve([latest, previous]),
+      releaseNotesRoot,
       releasesRoot,
       updateRoot,
     });
@@ -271,9 +278,19 @@ describe("refresh pipeline", () => {
       ),
     ) as { version?: string };
     const generatedSource = await fs.readFile(generatedSourcePath, "utf8");
+    const latestNotes = await fs.readFile(
+      path.join(releaseNotesRoot, "1.2.3.md"),
+      "utf8",
+    );
+    const previousNotes = await fs.readFile(
+      path.join(releaseNotesRoot, "1.2.2.md"),
+      "utf8",
+    );
 
     assert.equal(current.commit, latest.commit);
     assert.equal(update.version, latest.commit);
+    assert.equal(latestNotes, "## Latest\n\nLatest release notes.\n");
+    assert.equal(previousNotes, "## Previous\n\nPrevious release notes.\n");
     assert.match(generatedSource, /export const releases = \[/);
     await assert.rejects(
       fs.access(path.join(updateRoot, "darwin", "stable", latest.commit)),

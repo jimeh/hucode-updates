@@ -6,6 +6,7 @@ import { format } from "prettier";
 
 const REPO = "jimeh/hucode";
 const GENERATED_SOURCE = path.join("src", "generated", "releases.ts");
+const RELEASE_NOTES_ROOT = path.join("public", "release-notes");
 const UPDATE_ROOT = path.join("public", "api", "update");
 const RELEASES_ROOT = path.join("public", "api", "releases");
 
@@ -21,6 +22,7 @@ export type GitHubAsset = {
 
 export type GitHubRelease = {
   assets: GitHubAsset[];
+  body: string | null;
   draft: boolean;
   prerelease: boolean;
   published_at: string;
@@ -66,11 +68,19 @@ export type Release = {
 };
 
 /**
+ * Release metadata plus the GitHub release body used for static Markdown.
+ */
+export type ReleaseWithNotes = Release & {
+  releaseNotes: string;
+};
+
+/**
  * Output location overrides for refresh runs.
  */
 export type RefreshOptions = {
   generatedSourcePath?: string;
-  releaseProvider?: () => Promise<Release[]>;
+  releaseProvider?: () => Promise<ReleaseWithNotes[]>;
+  releaseNotesRoot?: string;
   releasesRoot?: string;
   updateRoot?: string;
 };
@@ -250,19 +260,20 @@ export async function fetchGitHubReleases(): Promise<GitHubRelease[]> {
   return githubReleases;
 }
 
-async function releases(): Promise<Release[]> {
+async function releases(): Promise<ReleaseWithNotes[]> {
   const githubReleases = await fetchGitHubReleases();
 
   const stable = githubReleases
     .filter((release) => !release.draft && !release.prerelease)
     .sort((a, b) => b.published_at.localeCompare(a.published_at));
 
-  const resolved: Release[] = [];
+  const resolved: ReleaseWithNotes[] = [];
   for (const release of stable) {
     resolved.push({
       assets: platformAssets(release.assets),
       commit: await tagCommit(release.tag_name),
       publishedAt: release.published_at,
+      releaseNotes: release.body ?? "",
       tag: release.tag_name,
       version: releaseVersion(release.tag_name),
     });
@@ -297,6 +308,11 @@ async function writeJson(filePath: string, value: unknown): Promise<void> {
   await fs.writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
+async function writeMarkdown(filePath: string, value: string): Promise<void> {
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, `${value.trimEnd()}\n`);
+}
+
 async function writeGeneratedSource(
   releases: Release[],
   filePath = GENERATED_SOURCE,
@@ -318,12 +334,23 @@ async function writeGeneratedSource(
   await fs.writeFile(filePath, source);
 }
 
+function releaseMetadata(release: ReleaseWithNotes): Release {
+  return {
+    assets: release.assets,
+    commit: release.commit,
+    publishedAt: release.publishedAt,
+    tag: release.tag,
+    version: release.version,
+  };
+}
+
 /**
  * Refreshes generated release metadata and static update responses.
  */
 export async function refresh(options: RefreshOptions = {}): Promise<void> {
   const generatedSourcePath = options.generatedSourcePath ?? GENERATED_SOURCE;
   const releaseProvider = options.releaseProvider ?? releases;
+  const releaseNotesRoot = options.releaseNotesRoot ?? RELEASE_NOTES_ROOT;
   const updateRoot = options.updateRoot ?? UPDATE_ROOT;
   const releasesRoot = options.releasesRoot ?? RELEASES_ROOT;
   const knownReleases = await releaseProvider();
@@ -339,8 +366,11 @@ export async function refresh(options: RefreshOptions = {}): Promise<void> {
     );
   }
 
+  const knownReleaseMetadata = knownReleases.map(releaseMetadata);
+
   await fs.rm(updateRoot, { recursive: true, force: true });
   await fs.rm(releasesRoot, { recursive: true, force: true });
+  await fs.rm(releaseNotesRoot, { recursive: true, force: true });
 
   for (const release of knownReleases.slice(1)) {
     for (const platform of latestPlatforms) {
@@ -351,9 +381,22 @@ export async function refresh(options: RefreshOptions = {}): Promise<void> {
     }
   }
 
-  await writeJson(path.join(releasesRoot, "current.json"), latest);
-  await writeJson(path.join(releasesRoot, "history.json"), knownReleases);
-  await writeGeneratedSource(knownReleases, generatedSourcePath);
+  for (const release of knownReleases) {
+    await writeMarkdown(
+      path.join(releaseNotesRoot, `${release.version}.md`),
+      release.releaseNotes,
+    );
+  }
+
+  await writeJson(
+    path.join(releasesRoot, "current.json"),
+    releaseMetadata(latest),
+  );
+  await writeJson(
+    path.join(releasesRoot, "history.json"),
+    knownReleaseMetadata,
+  );
+  await writeGeneratedSource(knownReleaseMetadata, generatedSourcePath);
 }
 
 if (
