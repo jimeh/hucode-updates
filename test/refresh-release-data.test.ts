@@ -11,6 +11,9 @@ import {
   platformAssets,
   releaseVersion,
   refresh,
+  serverWebAssets,
+  serverWebPlatform,
+  serverWebVersionResponse,
   sha256,
   updatePlatform,
   updateResponse,
@@ -128,6 +131,10 @@ describe("platform asset mapping", () => {
     assert.equal(updatePlatform("hucode-darwin-x64.zip"), "darwin");
     assert.equal(updatePlatform("hucode-darwin-arm64.zip"), "darwin-arm64");
     assert.equal(updatePlatform("hucode-linux-x64.zip"), "linux-x64");
+    assert.equal(
+      updatePlatform("hucode-server-darwin-arm64-web.zip"),
+      undefined,
+    );
     assert.equal(updatePlatform("hucode-darwin-x64.dmg"), undefined);
     assert.equal(updatePlatform("Hucode-darwin-x64.zip"), undefined);
   });
@@ -170,6 +177,41 @@ describe("platform asset mapping", () => {
       },
     );
   });
+
+  test("maps server-web ZIP assets to CLI update platforms", () => {
+    const digest =
+      "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+
+    assert.equal(
+      serverWebPlatform("hucode-server-darwin-arm64-web.zip"),
+      "server-darwin-arm64-web",
+    );
+    assert.equal(
+      serverWebPlatform("hucode-server-darwin-x64-web.zip"),
+      "server-darwin-web",
+    );
+    assert.equal(serverWebPlatform("hucode-darwin-arm64.zip"), undefined);
+    assert.deepEqual(
+      serverWebAssets([
+        asset("hucode-server-darwin-arm64-web.zip", { digest, size: 10 }),
+        asset("hucode-server-darwin-x64-web.zip", { size: 20 }),
+        asset("hucode-darwin-x64.zip", { size: 30 }),
+      ]),
+      {
+        "server-darwin-arm64-web": {
+          url: "https://downloads.example.com/hucode-server-darwin-arm64-web.zip",
+          sha256:
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          size: 10,
+        },
+        "server-darwin-web": {
+          url: "https://downloads.example.com/hucode-server-darwin-x64-web.zip",
+          sha256: undefined,
+          size: 20,
+        },
+      },
+    );
+  });
 });
 
 describe("update response", () => {
@@ -184,6 +226,7 @@ describe("update response", () => {
     },
     commit: "abc123",
     publishedAt: "2026-05-28T20:47:29Z",
+    serverWebAssets: {},
     tag: "v1.2.3",
     version: "1.2.3",
   };
@@ -210,6 +253,24 @@ describe("update response", () => {
   });
 });
 
+describe("server-web version response", () => {
+  test("builds Hucode CLI version lookup payloads", () => {
+    const release: Release = {
+      assets: {},
+      commit: "abc123",
+      publishedAt: "2026-05-28T20:47:29Z",
+      serverWebAssets: {},
+      tag: "v1.2.3",
+      version: "1.2.3",
+    };
+
+    assert.deepEqual(serverWebVersionResponse(release), {
+      version: "abc123",
+      name: "1.2.3",
+    });
+  });
+});
+
 describe("refresh pipeline", () => {
   test("rejects a latest release with no update-capable assets", async () => {
     const latest: ReleaseWithNotes = {
@@ -217,6 +278,7 @@ describe("refresh pipeline", () => {
       commit: "latest-commit",
       publishedAt: "2026-05-28T20:47:29Z",
       releaseNotes: "",
+      serverWebAssets: {},
       tag: "v1.2.3",
       version: "1.2.3",
     };
@@ -231,9 +293,11 @@ describe("refresh pipeline", () => {
 
   test("writes generated metadata from an injected release provider", async () => {
     const root = await fs.mkdtemp(path.join(tmpdir(), "hucode-updates-"));
+    const latestRoot = path.join(root, "latest");
     const updateRoot = path.join(root, "update");
     const releasesRoot = path.join(root, "releases");
     const releaseNotesRoot = path.join(root, "release-notes");
+    const versionsRoot = path.join(root, "versions");
     const generatedSourcePath = path.join(root, "generated", "releases.ts");
 
     const latest: ReleaseWithNotes = {
@@ -248,6 +312,7 @@ describe("refresh pipeline", () => {
       commit: "latest-commit",
       publishedAt: "2026-05-28T20:47:29Z",
       releaseNotes: "## Latest\n\nLatest release notes.\n\n",
+      serverWebAssets: {},
       tag: "v1.2.3",
       version: "1.2.3",
     };
@@ -256,16 +321,19 @@ describe("refresh pipeline", () => {
       commit: "previous-commit",
       publishedAt: "2026-05-27T20:47:29Z",
       releaseNotes: "## Previous\n\nPrevious release notes.",
+      serverWebAssets: {},
       tag: "v1.2.2",
       version: "1.2.2",
     };
 
     await refresh({
       generatedSourcePath,
+      latestRoot,
       releaseProvider: () => Promise.resolve([latest, previous]),
       releaseNotesRoot,
       releasesRoot,
       updateRoot,
+      versionsRoot,
     });
 
     const current = JSON.parse(
@@ -294,6 +362,105 @@ describe("refresh pipeline", () => {
     assert.match(generatedSource, /export const releases = \[/);
     await assert.rejects(
       fs.access(path.join(updateRoot, "darwin", "stable", latest.commit)),
+    );
+    await assert.rejects(fs.access(latestRoot));
+    await assert.rejects(fs.access(versionsRoot));
+  });
+
+  test("writes server-web metadata for releases with web ZIPs", async () => {
+    const root = await fs.mkdtemp(path.join(tmpdir(), "hucode-updates-"));
+    const latestRoot = path.join(root, "latest");
+    const updateRoot = path.join(root, "update");
+    const releasesRoot = path.join(root, "releases");
+    const releaseNotesRoot = path.join(root, "release-notes");
+    const versionsRoot = path.join(root, "versions");
+    const generatedSourcePath = path.join(root, "generated", "releases.ts");
+
+    const latest: ReleaseWithNotes = {
+      assets: {
+        darwin: {
+          updateUrl: "https://downloads.example.com/latest-darwin.zip",
+          updateSize: 100,
+        },
+      },
+      commit: "latest-commit",
+      publishedAt: "2026-05-28T20:47:29Z",
+      releaseNotes: "",
+      serverWebAssets: {
+        "server-darwin-web": {
+          url: "https://downloads.example.com/latest-server-web.zip",
+          size: 200,
+        },
+      },
+      tag: "v1.2.3",
+      version: "1.2.3",
+    };
+    const previous: ReleaseWithNotes = {
+      assets: {},
+      commit: "previous-commit",
+      publishedAt: "2026-05-27T20:47:29Z",
+      releaseNotes: "",
+      serverWebAssets: {
+        "server-darwin-arm64-web": {
+          url: "https://downloads.example.com/previous-server-web.zip",
+          size: 300,
+        },
+      },
+      tag: "v1.2.2",
+      version: "1.2.2",
+    };
+
+    await refresh({
+      generatedSourcePath,
+      latestRoot,
+      releaseProvider: () => Promise.resolve([latest, previous]),
+      releaseNotesRoot,
+      releasesRoot,
+      updateRoot,
+      versionsRoot,
+    });
+
+    const latestX64 = JSON.parse(
+      await fs.readFile(
+        path.join(latestRoot, "server-darwin-web", "stable"),
+        "utf8",
+      ),
+    ) as { name?: string; version?: string };
+    const latestArm64 = JSON.parse(
+      await fs.readFile(
+        path.join(latestRoot, "server-darwin-arm64-web", "stable"),
+        "utf8",
+      ),
+    ) as { name?: string; version?: string };
+    const versionX64 = JSON.parse(
+      await fs.readFile(
+        path.join(versionsRoot, "1.2.3", "server-darwin-web", "stable"),
+        "utf8",
+      ),
+    ) as { name?: string; version?: string };
+    const current = JSON.parse(
+      await fs.readFile(path.join(releasesRoot, "current.json"), "utf8"),
+    ) as { serverWebAssets?: Record<string, unknown> };
+    const generatedSource = await fs.readFile(generatedSourcePath, "utf8");
+
+    assert.deepEqual(latestX64, {
+      version: latest.commit,
+      name: latest.version,
+    });
+    assert.deepEqual(latestArm64, {
+      version: previous.commit,
+      name: previous.version,
+    });
+    assert.deepEqual(versionX64, {
+      version: latest.commit,
+      name: latest.version,
+    });
+    assert.ok(current.serverWebAssets?.["server-darwin-web"]);
+    assert.match(generatedSource, /validServerWebPlatforms/);
+    await assert.rejects(
+      fs.access(
+        path.join(versionsRoot, "1.2.2", "server-darwin-web", "stable"),
+      ),
     );
   });
 });

@@ -20,6 +20,7 @@
     },
     "commit": "c311feacedb2d03b971dc1a73568eb86823b89f1",
     "publishedAt": "2026-06-08T16:34:39Z",
+    "serverWebAssets": {},
     "tag": "v0.0.25",
     "version": "0.0.25"
   },
@@ -44,6 +45,7 @@
     },
     "commit": "7b2737fbf06bb0b2088b911bd38682eb8d446f36",
     "publishedAt": "2026-06-05T13:09:04Z",
+    "serverWebAssets": {},
     "tag": "v0.0.24",
     "version": "0.0.24"
   },
@@ -68,6 +70,7 @@
     },
     "commit": "7768e2a4797aeb58953d3d5dd5428d6c7146691b",
     "publishedAt": "2026-05-30T11:17:25Z",
+    "serverWebAssets": {},
     "tag": "v0.0.23",
     "version": "0.0.23"
   },
@@ -92,6 +95,7 @@
     },
     "commit": "5f104f7afc5e8fbed32357f9deae6aad24797e7e",
     "publishedAt": "2026-05-30T01:54:42Z",
+    "serverWebAssets": {},
     "tag": "v0.0.22",
     "version": "0.0.22"
   },
@@ -116,6 +120,7 @@
     },
     "commit": "df3fa28c5274f23d5d826850886f632668c29a93",
     "publishedAt": "2026-05-29T03:36:51Z",
+    "serverWebAssets": {},
     "tag": "v0.0.21",
     "version": "0.0.21"
   },
@@ -140,6 +145,7 @@
     },
     "commit": "06f666744e3312d81e281b4afc9844b0226774f6",
     "publishedAt": "2026-05-28T20:47:29Z",
+    "serverWebAssets": {},
     "tag": "v0.0.20",
     "version": "0.0.20"
   },
@@ -147,6 +153,7 @@
     "assets": {},
     "commit": "17f2c1bc4e5dad92df0be886c6cf4f1f5a0ccdeb",
     "publishedAt": "2026-05-26T20:50:16Z",
+    "serverWebAssets": {},
     "tag": "v0.0.19",
     "version": "0.0.19"
   }

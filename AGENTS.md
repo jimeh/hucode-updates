@@ -7,13 +7,15 @@ asset service for Hucode releases. Keep it framework-free TypeScript unless the
 existing shape stops fitting.
 
 - `src/index.ts` is the Worker fallback for update paths that are not served as
-  static files. Valid updater misses return `204`; malformed or unsupported
-  paths return `404`.
+  static files. Valid desktop updater misses return `204`; valid server-web
+  commit downloads redirect to their ZIP assets; malformed or unsupported paths
+  return `404`.
 - `scripts/refresh-release-data.ts` fetches release data from
   `jimeh/hucode` and regenerates checked-in static assets.
 - `src/generated/releases.ts` is generated metadata used by the Worker.
-- `public/api/releases/*`, `public/api/update/*`, and
-  `public/release-notes/*` are generated static assets.
+- `public/api/latest/*`, `public/api/releases/*`, `public/api/update/*`,
+  `public/api/versions/*`, and `public/release-notes/*` are generated static
+  assets.
 - `test/refresh-release-data.test.ts` covers the refresh pipeline.
 - `test/update-contract.test.ts` covers generated assets and Worker updater
   behavior.
@@ -52,7 +54,9 @@ pattern for workflow auth.
 `pnpm refresh` should be the only normal way to update these generated paths:
 
 - `public/api/releases/*`
+- `public/api/latest/*`
 - `public/api/update/*`
+- `public/api/versions/*`
 - `public/release-notes/*`
 - `src/generated/releases.ts`
 

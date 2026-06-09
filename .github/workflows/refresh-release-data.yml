@@ -84,7 +84,9 @@ jobs:
             case "${path}" in
               public/release-notes/*)
                 ;;
-              public/api/releases/* | public/api/update/*)
+              public/api/latest/* | public/api/releases/*)
+                ;;
+              public/api/update/* | public/api/versions/*)
                 ;;
               src/generated/releases.ts)
                 ;;
@@ -100,7 +102,14 @@ jobs:
           fi
 
       - name: Stage refreshed data
-        run: git add public/api/releases public/api/update public/release-notes src/generated/releases.ts
+        run: |
+          git add public/api/releases public/api/update public/release-notes src/generated/releases.ts
+
+          for path in public/api/latest public/api/versions; do
+            if [ -e "${path}" ] || git ls-files --error-unmatch "${path}" >/dev/null 2>&1; then
+              git add -A "${path}"
+            fi
+          done
 
       - name: Commit refreshed data
         uses: grafana/github-api-commit-action@b1d81091e8480dd11fcea8bc1f0ab977a0376ca5 # v1.0.0

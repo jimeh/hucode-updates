@@ -5,9 +5,10 @@ import { describe, test } from "node:test";
 import {
   latestRelease,
   releases,
+  validServerWebPlatforms,
   validPlatforms,
 } from "../src/generated/releases.ts";
-import worker from "../src/index.ts";
+import worker, { commitDownloadResponse } from "../src/index.ts";
 
 const updateAssets = latestRelease.assets as Record<
   string,
@@ -54,6 +55,55 @@ describe("update fallback", () => {
   });
 });
 
+describe("server-web download fallback", () => {
+  test("redirects commit downloads to generated server-web archives", () => {
+    const response = commitDownloadResponse(
+      "/commit:server-web-commit/server-darwin-web/stable",
+      [
+        {
+          commit: "server-web-commit",
+          serverWebAssets: {
+            "server-darwin-web": {
+              url: "https://downloads.example.com/server-web.zip",
+            },
+          },
+        },
+      ],
+    );
+
+    assert.ok(response);
+    assert.equal(response.status, 302);
+    assert.equal(
+      response.headers.get("Location"),
+      "https://downloads.example.com/server-web.zip",
+    );
+  });
+
+  test("rejects malformed or unavailable commit downloads", () => {
+    const invalidPaths = [
+      "/commit:server-web-commit/server-darwin-web/insider",
+      "/commit:server-web-commit/server-darwin-arm64-web/stable",
+      "/commit:server-web-commit/server-darwin-web/stable/extra",
+      "/commit:/server-darwin-web/stable",
+    ];
+    const knownReleases = [
+      {
+        commit: "server-web-commit",
+        serverWebAssets: {
+          "server-darwin-web": {
+            url: "https://downloads.example.com/server-web.zip",
+          },
+        },
+      },
+    ];
+
+    for (const pathname of invalidPaths) {
+      assert.equal(commitDownloadResponse(pathname, knownReleases), undefined);
+      assert.equal(worker.fetch(request(pathname)).status, 404);
+    }
+  });
+});
+
 describe("generated update assets", () => {
   test("derives valid platforms from latest release ZIP assets", () => {
     assert.deepEqual([...validPlatforms].sort(), ["darwin", "darwin-arm64"]);
@@ -66,6 +116,31 @@ describe("generated update assets", () => {
       const responsePath = `public/release-notes/${release.version}.md`;
 
       await fs.access(responsePath);
+    }
+  });
+
+  test("keeps server-web platforms separate from desktop update platforms", () => {
+    for (const platform of validServerWebPlatforms) {
+      assert.equal(validPlatforms.includes(platform), false);
+    }
+  });
+
+  test("generates optional server-web release metadata", async () => {
+    for (const release of releases) {
+      assert.ok("serverWebAssets" in release);
+
+      for (const platform of Object.keys(release.serverWebAssets)) {
+        const responsePath = `public/api/versions/${release.version}/${platform}/stable`;
+        const response = JSON.parse(
+          await fs.readFile(responsePath, "utf8"),
+        ) as {
+          name?: string;
+          version?: string;
+        };
+
+        assert.equal(response.name, release.version);
+        assert.equal(response.version, release.commit);
+      }
     }
   });
 

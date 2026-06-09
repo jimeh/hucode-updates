@@ -9,6 +9,8 @@ const GENERATED_SOURCE = path.join("src", "generated", "releases.ts");
 const RELEASE_NOTES_ROOT = path.join("public", "release-notes");
 const UPDATE_ROOT = path.join("public", "api", "update");
 const RELEASES_ROOT = path.join("public", "api", "releases");
+const LATEST_ROOT = path.join("public", "api", "latest");
+const VERSIONS_ROOT = path.join("public", "api", "versions");
 
 /**
  * Minimal GitHub release asset shape used by the refresh pipeline.
@@ -57,12 +59,22 @@ export type PlatformAsset = {
 };
 
 /**
+ * Hucode CLI server-web archive metadata for one update platform.
+ */
+export type ServerWebAsset = {
+  sha256?: string;
+  size: number;
+  url: string;
+};
+
+/**
  * Generated release metadata consumed by static assets and Worker fallback.
  */
 export type Release = {
   assets: Record<string, PlatformAsset>;
   commit: string;
   publishedAt: string;
+  serverWebAssets: Record<string, ServerWebAsset>;
   tag: string;
   version: string;
 };
@@ -79,10 +91,12 @@ export type ReleaseWithNotes = Release & {
  */
 export type RefreshOptions = {
   generatedSourcePath?: string;
+  latestRoot?: string;
   releaseProvider?: () => Promise<ReleaseWithNotes[]>;
   releaseNotesRoot?: string;
   releasesRoot?: string;
   updateRoot?: string;
+  versionsRoot?: string;
 };
 
 /**
@@ -154,6 +168,25 @@ export function downloadPlatform(assetName: string): string | undefined {
   }
 
   return undefined;
+}
+
+/**
+ * Maps CLI server-web ZIP asset names to update platform identifiers.
+ */
+export function serverWebPlatform(assetName: string): string | undefined {
+  const match = /^hucode-server-darwin-(?<arch>x64|arm64)-web\.zip$/.exec(
+    assetName,
+  );
+  const arch = match?.groups?.arch;
+  if (!arch) {
+    return undefined;
+  }
+
+  if (arch === "x64") {
+    return "server-darwin-web";
+  }
+
+  return "server-darwin-arm64-web";
 }
 
 /**
@@ -240,6 +273,30 @@ export function platformAssets(
 }
 
 /**
+ * Builds per-platform CLI server-web metadata from release assets.
+ */
+export function serverWebAssets(
+  assets: GitHubAsset[],
+): Record<string, ServerWebAsset> {
+  const platforms: Record<string, ServerWebAsset> = {};
+
+  for (const asset of assets) {
+    const platform = serverWebPlatform(asset.name);
+    if (!platform) {
+      continue;
+    }
+
+    platforms[platform] = {
+      url: asset.browser_download_url,
+      sha256: sha256(asset.digest),
+      size: asset.size,
+    };
+  }
+
+  return platforms;
+}
+
+/**
  * Fetches all GitHub releases for the upstream Hucode repository.
  */
 export async function fetchGitHubReleases(): Promise<GitHubRelease[]> {
@@ -274,6 +331,7 @@ async function releases(): Promise<ReleaseWithNotes[]> {
       commit: await tagCommit(release.tag_name),
       publishedAt: release.published_at,
       releaseNotes: release.body ?? "",
+      serverWebAssets: serverWebAssets(release.assets),
       tag: release.tag_name,
       version: releaseVersion(release.tag_name),
     });
@@ -303,6 +361,16 @@ export function updateResponse(latest: Release, platform: string): unknown {
   };
 }
 
+/**
+ * Builds a Hucode CLI-compatible version lookup response.
+ */
+export function serverWebVersionResponse(release: Release): unknown {
+  return {
+    version: release.commit,
+    name: release.version,
+  };
+}
+
 async function writeJson(filePath: string, value: unknown): Promise<void> {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`);
@@ -325,6 +393,13 @@ async function writeGeneratedSource(
       "",
       "export const latestRelease = releases[0];",
       "export const validPlatforms = Object.keys(latestRelease.assets);",
+      [
+        "export const validServerWebPlatforms = Array.from(",
+        "  new Set(releases.flatMap(",
+        "    (release) => Object.keys(release.serverWebAssets),",
+        "  )),",
+        ").sort();",
+      ].join("\n"),
       "",
     ].join("\n"),
     { parser: "typescript" },
@@ -339,9 +414,27 @@ function releaseMetadata(release: ReleaseWithNotes): Release {
     assets: release.assets,
     commit: release.commit,
     publishedAt: release.publishedAt,
+    serverWebAssets: release.serverWebAssets,
     tag: release.tag,
     version: release.version,
   };
+}
+
+/**
+ * Finds the newest release for each server-web platform.
+ *
+ * Assumes releases are sorted newest-first; the first platform match wins.
+ */
+function latestServerWebReleases(releases: Release[]): Record<string, Release> {
+  const latestByPlatform: Record<string, Release> = {};
+
+  for (const release of releases) {
+    for (const platform of Object.keys(release.serverWebAssets)) {
+      latestByPlatform[platform] ??= release;
+    }
+  }
+
+  return latestByPlatform;
 }
 
 /**
@@ -349,10 +442,12 @@ function releaseMetadata(release: ReleaseWithNotes): Release {
  */
 export async function refresh(options: RefreshOptions = {}): Promise<void> {
   const generatedSourcePath = options.generatedSourcePath ?? GENERATED_SOURCE;
+  const latestRoot = options.latestRoot ?? LATEST_ROOT;
   const releaseProvider = options.releaseProvider ?? releases;
   const releaseNotesRoot = options.releaseNotesRoot ?? RELEASE_NOTES_ROOT;
   const updateRoot = options.updateRoot ?? UPDATE_ROOT;
   const releasesRoot = options.releasesRoot ?? RELEASES_ROOT;
+  const versionsRoot = options.versionsRoot ?? VERSIONS_ROOT;
   const knownReleases = await releaseProvider();
   const latest = knownReleases[0];
   if (!latest) {
@@ -371,6 +466,8 @@ export async function refresh(options: RefreshOptions = {}): Promise<void> {
   await fs.rm(updateRoot, { recursive: true, force: true });
   await fs.rm(releasesRoot, { recursive: true, force: true });
   await fs.rm(releaseNotesRoot, { recursive: true, force: true });
+  await fs.rm(latestRoot, { recursive: true, force: true });
+  await fs.rm(versionsRoot, { recursive: true, force: true });
 
   for (const release of knownReleases.slice(1)) {
     for (const platform of latestPlatforms) {
@@ -386,6 +483,23 @@ export async function refresh(options: RefreshOptions = {}): Promise<void> {
       path.join(releaseNotesRoot, `${release.version}.md`),
       release.releaseNotes,
     );
+  }
+
+  const knownServerWebLatest = latestServerWebReleases(knownReleaseMetadata);
+  for (const [platform, release] of Object.entries(knownServerWebLatest)) {
+    await writeJson(
+      path.join(latestRoot, platform, "stable"),
+      serverWebVersionResponse(release),
+    );
+  }
+
+  for (const release of knownReleaseMetadata) {
+    for (const platform of Object.keys(release.serverWebAssets)) {
+      await writeJson(
+        path.join(versionsRoot, release.version, platform, "stable"),
+        serverWebVersionResponse(release),
+      );
+    }
   }
 
   await writeJson(
