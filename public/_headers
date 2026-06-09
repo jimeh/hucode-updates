@@ -1,4 +1,16 @@
+/api/latest/*
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: public, max-age=0, must-revalidate
+
+/api/releases/*
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: public, max-age=0, must-revalidate
+
 /api/update/*
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: public, max-age=0, must-revalidate
+
+/api/versions/*
   Content-Type: application/json; charset=utf-8
   Cache-Control: public, max-age=0, must-revalidate
 
