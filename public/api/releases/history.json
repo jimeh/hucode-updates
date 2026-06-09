@@ -2,6 +2,42 @@
   {
     "assets": {
       "darwin-arm64": {
+        "updateUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.26/hucode-darwin-arm64.zip",
+        "updateSha256": "ed5db8e5f771bf131fe0bd5de63fe98e0f9f5dab3f03ac08794486f21139d110",
+        "updateSize": 274984844,
+        "downloadUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.26/hucode-darwin-arm64.dmg",
+        "downloadSha256": "b635fa6daa01f8056c7b1699c51281aa31f50326596927338817e81fe041de5f",
+        "downloadSize": 200959296
+      },
+      "darwin": {
+        "updateUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.26/hucode-darwin-x64.zip",
+        "updateSha256": "5796f7c935bc90d9e360578e6d192be139070e440f55409e28e16203fb78eafe",
+        "updateSize": 284905189,
+        "downloadUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.26/hucode-darwin-x64.dmg",
+        "downloadSha256": "5c4c7b0bf834871c7571373ab45c0d2d5343cdb6534d037585cee17051f99cbc",
+        "downloadSize": 216865764
+      }
+    },
+    "commit": "3a450adf24caef64d7776300ede0e57ddd44390c",
+    "publishedAt": "2026-06-09T22:09:30Z",
+    "serverWebAssets": {
+      "server-darwin-arm64-web": {
+        "url": "https://github.com/jimeh/hucode/releases/download/v0.0.26/hucode-server-darwin-arm64-web.zip",
+        "sha256": "88841eb5500c4a09fecf890b2726f5eb654f7d686ccd6c8c2f0c650116fd62f3",
+        "size": 146348799
+      },
+      "server-darwin-web": {
+        "url": "https://github.com/jimeh/hucode/releases/download/v0.0.26/hucode-server-darwin-x64-web.zip",
+        "sha256": "e70b222f4c53e86eef0ed3d7dda30f93e4370caf3b82506aed60296c6b108f8d",
+        "size": 148365449
+      }
+    },
+    "tag": "v0.0.26",
+    "version": "0.0.26"
+  },
+  {
+    "assets": {
+      "darwin-arm64": {
         "updateUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.25/hucode-darwin-arm64.zip",
         "updateSha256": "0ea3ab3ddcd5f01ee91ca33901eb40a9f24a0d01ad6b9fbf2f1ddd44784112cd",
         "updateSize": 273936118,
