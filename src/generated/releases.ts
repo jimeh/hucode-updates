@@ -5,6 +5,52 @@ export const releases = [
     assets: {
       "darwin-arm64": {
         updateUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.28/hucode-darwin-arm64.zip",
+        updateSha256:
+          "fdd0f611f065a6002505e1efdcb4b19eafd458755af7602abea4ae8a38abcc82",
+        updateSize: 274981458,
+        downloadUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.28/hucode-darwin-arm64.dmg",
+        downloadSha256:
+          "0e2254eb3f971ffcd7cc9a8f24865226153e313f5133ce6bc1d3bf5ad857776a",
+        downloadSize: 200949560,
+      },
+      darwin: {
+        updateUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.28/hucode-darwin-x64.zip",
+        updateSha256:
+          "068cfe39a94d194e21dfc3f1d9116a27a7668939f69806c5b6ebce1c3c6a987c",
+        updateSize: 284911171,
+        downloadUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.28/hucode-darwin-x64.dmg",
+        downloadSha256:
+          "5fccfc245e6e3618554bc1b78f518097c9cd1a0cd6f8b58caba802faadc7b98e",
+        downloadSize: 216866303,
+      },
+    },
+    commit: "933abc21d696f56f073ae28692ba35226d30d7bf",
+    publishedAt: "2026-06-10T21:16:45Z",
+    serverWebAssets: {
+      "server-darwin-arm64-web": {
+        url: "https://github.com/jimeh/hucode/releases/download/v0.0.28/hucode-server-darwin-arm64-web.zip",
+        sha256:
+          "0cd54392d7c11cd8dc4fa377ad2d80d82ad7b2ac5afe8199f036f8edf69690d3",
+        size: 146349412,
+      },
+      "server-darwin-web": {
+        url: "https://github.com/jimeh/hucode/releases/download/v0.0.28/hucode-server-darwin-x64-web.zip",
+        sha256:
+          "e4b7fede350b207a42803eaf42346c6466bc56fe99a936a4a58224a850e302f0",
+        size: 148366070,
+      },
+    },
+    tag: "v0.0.28",
+    version: "0.0.28",
+  },
+  {
+    assets: {
+      "darwin-arm64": {
+        updateUrl:
           "https://github.com/jimeh/hucode/releases/download/v0.0.27/hucode-darwin-arm64.zip",
         updateSha256:
           "da69a1d2e9d9c158bf73a34a55d13b0d1ab26429df7468c717b6d38c1d1e63b1",
