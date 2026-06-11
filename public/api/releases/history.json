@@ -2,6 +2,50 @@
   {
     "assets": {
       "darwin-arm64": {
+        "updateUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.30/hucode-darwin-arm64.zip",
+        "updateSha256": "4e10176091e8fa8ab2681210e84bacb6c1da5ae374ae800c5dd367c1a70e1881",
+        "updateSize": 276820143,
+        "downloadUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.30/hucode-darwin-arm64.dmg",
+        "downloadSha256": "27fd227c4c4128920fe75d057c27b2edcf7e40f4300bc45633be7be3e1347ab0",
+        "downloadSize": 203182684
+      },
+      "darwin": {
+        "updateUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.30/hucode-darwin-x64.zip",
+        "updateSha256": "95048ab4fa76b40ceb3739e5df79d7114b5e4992b9b563f28f4e5b8ec476c659",
+        "updateSize": 286821413,
+        "downloadUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.30/hucode-darwin-x64.dmg",
+        "downloadSha256": "d322389d1b06fa74dcf3b721c9db905a50d52e30b1e1debdf59523e5ccbb62de",
+        "downloadSize": 218145737
+      }
+    },
+    "commit": "0ca41965bafbc407da8e393593fb2ac4fdeca290",
+    "publishedAt": "2026-06-11T03:57:14Z",
+    "serverWebAssets": {
+      "server-darwin-arm64-web": {
+        "url": "https://github.com/jimeh/hucode/releases/download/v0.0.30/hucode-server-darwin-arm64-web.zip",
+        "sha256": "6f0850866bb7cea89bc9ec60012c30e5e87d5ac729686f346a2610ef72be001c",
+        "size": 147871956
+      },
+      "server-darwin-web": {
+        "url": "https://github.com/jimeh/hucode/releases/download/v0.0.30/hucode-server-darwin-x64-web.zip",
+        "sha256": "f39ced5880a0448bc00f8b875c28ccc00363dde12b1d1f9f2bc7d1943d0c5fec",
+        "size": 149931901
+      }
+    },
+    "tag": "v0.0.30",
+    "version": "0.0.30"
+  },
+  {
+    "assets": {},
+    "commit": "142fd4fc2cbbdf0a3534b5c03f55162202415e0e",
+    "publishedAt": "2026-06-10T21:27:14Z",
+    "serverWebAssets": {},
+    "tag": "v0.0.29",
+    "version": "0.0.29"
+  },
+  {
+    "assets": {
+      "darwin-arm64": {
         "updateUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.28/hucode-darwin-arm64.zip",
         "updateSha256": "fdd0f611f065a6002505e1efdcb4b19eafd458755af7602abea4ae8a38abcc82",
         "updateSize": 274981458,
