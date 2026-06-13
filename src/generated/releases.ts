@@ -5,6 +5,52 @@ export const releases = [
     assets: {
       "darwin-arm64": {
         updateUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.31/hucode-darwin-arm64.zip",
+        updateSha256:
+          "2ff25d858788baeba868fbacf047361497740e6341c9d102682db73598a3a6cf",
+        updateSize: 276826782,
+        downloadUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.31/hucode-darwin-arm64.dmg",
+        downloadSha256:
+          "e65046a2919df73fbfc5089882999793470218f7548e639cff32a3d0252681bb",
+        downloadSize: 203171048,
+      },
+      darwin: {
+        updateUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.31/hucode-darwin-x64.zip",
+        updateSha256:
+          "aaa193edfb0460da3e9dfa25a2cfb770593cdd623d27bd84da7db4073cc4ef48",
+        updateSize: 286827995,
+        downloadUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.31/hucode-darwin-x64.dmg",
+        downloadSha256:
+          "1d9d0a3c23dc7f3395f3e20680070f6573ab866d3be8b8c6031d559fc474e366",
+        downloadSize: 218151210,
+      },
+    },
+    commit: "4440f6fa0fb5c13c110a43b198912026b5d6c8ea",
+    publishedAt: "2026-06-13T18:19:03Z",
+    serverWebAssets: {
+      "server-darwin-arm64-web": {
+        url: "https://github.com/jimeh/hucode/releases/download/v0.0.31/hucode-server-darwin-arm64-web.zip",
+        sha256:
+          "c589c9a64569a1c44c42234410e7d53d1e84276e7640ec1f5678f3e4f065f6a7",
+        size: 147873436,
+      },
+      "server-darwin-web": {
+        url: "https://github.com/jimeh/hucode/releases/download/v0.0.31/hucode-server-darwin-x64-web.zip",
+        sha256:
+          "f7822ee1accfb7abbeae927c6f9b7c0a3cd2d4879039e2aab61e5df1020a53a9",
+        size: 149933361,
+      },
+    },
+    tag: "v0.0.31",
+    version: "0.0.31",
+  },
+  {
+    assets: {
+      "darwin-arm64": {
+        updateUrl:
           "https://github.com/jimeh/hucode/releases/download/v0.0.30/hucode-darwin-arm64.zip",
         updateSha256:
           "4e10176091e8fa8ab2681210e84bacb6c1da5ae374ae800c5dd367c1a70e1881",
