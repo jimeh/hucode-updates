@@ -10,6 +10,7 @@ import {
   githubHeaders,
   platformAssets,
   releaseVersion,
+  releaseVersionInfo,
   refresh,
   serverWebAssets,
   serverWebPlatform,
@@ -32,6 +33,7 @@ function asset(
     digest: options.digest,
     name,
     size: options.size ?? 123,
+    url: `https://api.github.com/assets/${name}`,
   };
 }
 
@@ -70,6 +72,100 @@ describe("release metadata parsing", () => {
     );
     assert.equal(sha256(undefined), undefined);
     assert.equal(sha256("sha512:abcdef"), undefined);
+  });
+});
+
+describe("release version info", () => {
+  test("prefers release metadata asset for VS Code version", async () => {
+    const originalFetch = globalThis.fetch;
+    const release = githubRelease("v0.0.32", {
+      assets: [asset("hucode-release-metadata.json")],
+    });
+
+    globalThis.fetch = () =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({
+            schemaVersion: 1,
+            hucodeVersion: "0.0.32",
+            vscodeVersion: "1.125.0",
+            commit: "release-commit",
+            quality: "stable",
+          }),
+        ),
+      );
+
+    try {
+      assert.deepEqual(await releaseVersionInfo(release, "release-commit"), {
+        hucodeVersion: "0.0.32",
+        vscodeVersion: "1.125.0",
+      });
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  test("falls back to package.json at the release commit", async () => {
+    const originalFetch = globalThis.fetch;
+    const release = githubRelease("v0.0.32");
+    const content = Buffer.from(
+      JSON.stringify({ version: "1.125.0" }),
+      "utf8",
+    ).toString("base64");
+    const requestedUrls: string[] = [];
+
+    const mockFetch: typeof fetch = (input) => {
+      if (typeof input !== "string") {
+        throw new TypeError("Expected fetch URL string.");
+      }
+
+      requestedUrls.push(input);
+
+      return Promise.resolve(
+        new Response(JSON.stringify({ content, encoding: "base64" })),
+      );
+    };
+
+    globalThis.fetch = mockFetch;
+
+    try {
+      assert.deepEqual(await releaseVersionInfo(release, "release-commit"), {
+        hucodeVersion: "0.0.32",
+        vscodeVersion: "1.125.0",
+      });
+      assert.deepEqual(requestedUrls, [
+        "https://api.github.com/repos/jimeh/hucode/contents/package.json?ref=release-commit",
+      ]);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  test("rejects metadata that does not match the release tag", async () => {
+    const originalFetch = globalThis.fetch;
+    const release = githubRelease("v0.0.32", {
+      assets: [asset("hucode-release-metadata.json")],
+    });
+
+    globalThis.fetch = () =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({
+            schemaVersion: 1,
+            hucodeVersion: "0.0.31",
+            vscodeVersion: "1.125.0",
+          }),
+        ),
+      );
+
+    try {
+      await assert.rejects(
+        releaseVersionInfo(release, "release-commit"),
+        /does not match tag/,
+      );
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
   });
 });
 
@@ -229,6 +325,7 @@ describe("update response", () => {
     serverWebAssets: {},
     tag: "v1.2.3",
     version: "1.2.3",
+    vscodeVersion: "1.125.0",
   };
 
   test("builds VS Code updater payloads", () => {
@@ -238,7 +335,8 @@ describe("update response", () => {
       notes: "abc123",
       pub_date: "2026-05-28T20:47:29Z",
       version: "abc123",
-      productVersion: "1.2.3",
+      productVersion: "1.125.0",
+      hucodeVersion: "1.2.3",
       timestamp: Date.parse("2026-05-28T20:47:29Z"),
       sha256hash:
         "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
@@ -262,6 +360,7 @@ describe("server-web version response", () => {
       serverWebAssets: {},
       tag: "v1.2.3",
       version: "1.2.3",
+      vscodeVersion: "1.125.0",
     };
 
     assert.deepEqual(serverWebVersionResponse(release), {
@@ -281,6 +380,7 @@ describe("refresh pipeline", () => {
       serverWebAssets: {},
       tag: "v1.2.3",
       version: "1.2.3",
+      vscodeVersion: "1.125.0",
     };
 
     await assert.rejects(
@@ -315,6 +415,7 @@ describe("refresh pipeline", () => {
       serverWebAssets: {},
       tag: "v1.2.3",
       version: "1.2.3",
+      vscodeVersion: "1.125.0",
     };
     const previous: ReleaseWithNotes = {
       assets: {},
@@ -324,6 +425,7 @@ describe("refresh pipeline", () => {
       serverWebAssets: {},
       tag: "v1.2.2",
       version: "1.2.2",
+      vscodeVersion: "1.124.0",
     };
 
     await refresh({
@@ -394,6 +496,7 @@ describe("refresh pipeline", () => {
       },
       tag: "v1.2.3",
       version: "1.2.3",
+      vscodeVersion: "1.125.0",
     };
     const previous: ReleaseWithNotes = {
       assets: {},
@@ -408,6 +511,7 @@ describe("refresh pipeline", () => {
       },
       tag: "v1.2.2",
       version: "1.2.2",
+      vscodeVersion: "1.124.0",
     };
 
     await refresh({

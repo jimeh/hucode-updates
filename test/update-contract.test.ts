@@ -151,6 +151,7 @@ describe("generated update assets", () => {
         const response = JSON.parse(
           await fs.readFile(responsePath, "utf8"),
         ) as {
+          hucodeVersion?: string;
           productVersion?: string;
           sha256hash?: string;
           timestamp?: number;
@@ -160,7 +161,8 @@ describe("generated update assets", () => {
         const updateAsset = updateAssets[platform];
         assert.ok(updateAsset);
 
-        assert.equal(response.productVersion, latestRelease.version);
+        assert.equal(response.productVersion, latestRelease.vscodeVersion);
+        assert.equal(response.hucodeVersion, latestRelease.version);
         assert.equal(response.version, latestRelease.commit);
         assert.equal(response.url, updateAsset.updateUrl);
         assert.equal(response.sha256hash, updateAsset.updateSha256);
