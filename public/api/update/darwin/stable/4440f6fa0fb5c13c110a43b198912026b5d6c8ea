@@ -4,7 +4,8 @@
   "notes": "006ad6478f8affa04343ab19b08d2ad97dd324f2",
   "pub_date": "2026-06-18T10:14:40Z",
   "version": "006ad6478f8affa04343ab19b08d2ad97dd324f2",
-  "productVersion": "0.0.32",
+  "productVersion": "1.125.0",
+  "hucodeVersion": "0.0.32",
   "timestamp": 1781777680000,
   "sha256hash": "163c28b1b5933abaf8fe0b1606bbe6a8e399d5004e464ae351a1419d7a56cee3"
 }

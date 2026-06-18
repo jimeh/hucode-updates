@@ -32,5 +32,6 @@
     }
   },
   "tag": "v0.0.32",
-  "version": "0.0.32"
+  "version": "0.0.32",
+  "vscodeVersion": "1.125.0"
 }

@@ -11,6 +11,7 @@ const UPDATE_ROOT = path.join("public", "api", "update");
 const RELEASES_ROOT = path.join("public", "api", "releases");
 const LATEST_ROOT = path.join("public", "api", "latest");
 const VERSIONS_ROOT = path.join("public", "api", "versions");
+const RELEASE_METADATA_ASSET = "hucode-release-metadata.json";
 
 /**
  * Minimal GitHub release asset shape used by the refresh pipeline.
@@ -20,6 +21,7 @@ export type GitHubAsset = {
   digest?: string;
   name: string;
   size: number;
+  url: string;
 };
 
 export type GitHubRelease = {
@@ -77,6 +79,23 @@ export type Release = {
   serverWebAssets: Record<string, ServerWebAsset>;
   tag: string;
   version: string;
+  vscodeVersion: string;
+};
+
+/**
+ * Metadata asset optionally published alongside Hucode release binaries.
+ */
+export type ReleaseMetadata = {
+  commit?: string;
+  hucodeVersion: string;
+  quality?: string;
+  schemaVersion: number;
+  vscodeVersion: string;
+};
+
+type GitHubContent = {
+  content: string;
+  encoding: string;
 };
 
 /**
@@ -110,6 +129,43 @@ export function releaseVersion(tag: string): string {
   }
 
   return version;
+}
+
+function assertVersion(value: string, label: string): void {
+  if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(value)) {
+    throw new Error(`${label} is not a supported version: ${value}`);
+  }
+}
+
+function validateReleaseMetadata(
+  metadata: ReleaseMetadata,
+  release: GitHubRelease,
+  commit: string,
+  hucodeVersion: string,
+): ReleaseMetadata {
+  if (metadata.schemaVersion !== 1) {
+    throw new Error(
+      `${release.tag_name} metadata uses unsupported schema version.`,
+    );
+  }
+
+  if (metadata.hucodeVersion !== hucodeVersion) {
+    throw new Error(
+      `${release.tag_name} metadata hucodeVersion ` +
+        `${metadata.hucodeVersion} does not match tag ${hucodeVersion}.`,
+    );
+  }
+
+  if (metadata.commit && metadata.commit !== commit) {
+    throw new Error(
+      `${release.tag_name} metadata commit ${metadata.commit} ` +
+        `does not match tag commit ${commit}.`,
+    );
+  }
+
+  assertVersion(metadata.vscodeVersion, "vscodeVersion");
+
+  return metadata;
 }
 
 /**
@@ -216,6 +272,39 @@ async function fetchJson<T>(url: string): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+async function fetchAssetJson<T>(asset: GitHubAsset): Promise<T> {
+  const headers = githubHeaders();
+  headers.set("Accept", "application/octet-stream");
+
+  const response = await fetch(asset.url, { headers });
+  if (!response.ok) {
+    throw new Error(`${asset.name} returned ${response.status}`);
+  }
+
+  return response.json() as Promise<T>;
+}
+
+/**
+ * Fetches and parses a JSON source file from the Hucode repository.
+ */
+export async function fetchGitHubSourceJson<T>(
+  ref: string,
+  filePath: string,
+): Promise<T> {
+  const file = await fetchJson<GitHubContent>(
+    `https://api.github.com/repos/${REPO}/contents/${filePath}?ref=${ref}`,
+  );
+
+  if (file.encoding !== "base64") {
+    throw new Error(`${filePath} uses unsupported encoding ${file.encoding}`);
+  }
+
+  const text = Buffer.from(file.content.replace(/\s/g, ""), "base64").toString(
+    "utf8",
+  );
+  return JSON.parse(text) as T;
+}
+
 async function tagCommit(tag: string): Promise<string> {
   const ref = await fetchJson<GitHubRef>(
     `https://api.github.com/repos/${REPO}/git/ref/tags/${tag}`,
@@ -317,6 +406,47 @@ export async function fetchGitHubReleases(): Promise<GitHubRelease[]> {
   return githubReleases;
 }
 
+/**
+ * Resolves Hucode and VS Code versions for a GitHub release.
+ */
+export async function releaseVersionInfo(
+  release: GitHubRelease,
+  commit: string,
+): Promise<{ hucodeVersion: string; vscodeVersion: string }> {
+  const hucodeVersion = releaseVersion(release.tag_name);
+  const metadataAsset = release.assets.find(
+    (asset) => asset.name === RELEASE_METADATA_ASSET,
+  );
+
+  if (metadataAsset) {
+    const metadata = validateReleaseMetadata(
+      await fetchAssetJson<ReleaseMetadata>(metadataAsset),
+      release,
+      commit,
+      hucodeVersion,
+    );
+
+    return {
+      hucodeVersion,
+      vscodeVersion: metadata.vscodeVersion,
+    };
+  }
+
+  const packageJson = await fetchGitHubSourceJson<{ version?: unknown }>(
+    commit,
+    "package.json",
+  );
+  if (typeof packageJson.version !== "string") {
+    throw new Error(`${release.tag_name} package.json is missing version.`);
+  }
+  assertVersion(packageJson.version, "package.json version");
+
+  return {
+    hucodeVersion,
+    vscodeVersion: packageJson.version,
+  };
+}
+
 async function releases(): Promise<ReleaseWithNotes[]> {
   const githubReleases = await fetchGitHubReleases();
 
@@ -326,14 +456,18 @@ async function releases(): Promise<ReleaseWithNotes[]> {
 
   const resolved: ReleaseWithNotes[] = [];
   for (const release of stable) {
+    const commit = await tagCommit(release.tag_name);
+    const versionInfo = await releaseVersionInfo(release, commit);
+
     resolved.push({
       assets: platformAssets(release.assets),
-      commit: await tagCommit(release.tag_name),
+      commit,
       publishedAt: release.published_at,
       releaseNotes: release.body ?? "",
       serverWebAssets: serverWebAssets(release.assets),
       tag: release.tag_name,
-      version: releaseVersion(release.tag_name),
+      version: versionInfo.hucodeVersion,
+      vscodeVersion: versionInfo.vscodeVersion,
     });
   }
 
@@ -355,7 +489,8 @@ export function updateResponse(latest: Release, platform: string): unknown {
     notes: latest.commit,
     pub_date: latest.publishedAt,
     version: latest.commit,
-    productVersion: latest.version,
+    productVersion: latest.vscodeVersion,
+    hucodeVersion: latest.version,
     timestamp: Date.parse(latest.publishedAt),
     sha256hash: asset.updateSha256,
   };
@@ -417,6 +552,7 @@ function releaseMetadata(release: ReleaseWithNotes): Release {
     serverWebAssets: release.serverWebAssets,
     tag: release.tag,
     version: release.version,
+    vscodeVersion: release.vscodeVersion,
   };
 }
 

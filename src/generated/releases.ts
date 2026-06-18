@@ -46,6 +46,7 @@ export const releases = [
     },
     tag: "v0.0.32",
     version: "0.0.32",
+    vscodeVersion: "1.125.0",
   },
   {
     assets: {
@@ -92,6 +93,7 @@ export const releases = [
     },
     tag: "v0.0.31",
     version: "0.0.31",
+    vscodeVersion: "1.124.2",
   },
   {
     assets: {
@@ -138,6 +140,7 @@ export const releases = [
     },
     tag: "v0.0.30",
     version: "0.0.30",
+    vscodeVersion: "1.124.0",
   },
   {
     assets: {},
@@ -146,6 +149,7 @@ export const releases = [
     serverWebAssets: {},
     tag: "v0.0.29",
     version: "0.0.29",
+    vscodeVersion: "1.124.0",
   },
   {
     assets: {
@@ -192,6 +196,7 @@ export const releases = [
     },
     tag: "v0.0.28",
     version: "0.0.28",
+    vscodeVersion: "1.123.0",
   },
   {
     assets: {
@@ -238,6 +243,7 @@ export const releases = [
     },
     tag: "v0.0.27",
     version: "0.0.27",
+    vscodeVersion: "1.123.0",
   },
   {
     assets: {
@@ -284,6 +290,7 @@ export const releases = [
     },
     tag: "v0.0.26",
     version: "0.0.26",
+    vscodeVersion: "1.123.0",
   },
   {
     assets: {
@@ -317,6 +324,7 @@ export const releases = [
     serverWebAssets: {},
     tag: "v0.0.25",
     version: "0.0.25",
+    vscodeVersion: "1.123.0",
   },
   {
     assets: {
@@ -350,6 +358,7 @@ export const releases = [
     serverWebAssets: {},
     tag: "v0.0.24",
     version: "0.0.24",
+    vscodeVersion: "1.123.0",
   },
   {
     assets: {
@@ -383,6 +392,7 @@ export const releases = [
     serverWebAssets: {},
     tag: "v0.0.23",
     version: "0.0.23",
+    vscodeVersion: "1.122.1",
   },
   {
     assets: {
@@ -416,6 +426,7 @@ export const releases = [
     serverWebAssets: {},
     tag: "v0.0.22",
     version: "0.0.22",
+    vscodeVersion: "1.122.0",
   },
   {
     assets: {
@@ -449,6 +460,7 @@ export const releases = [
     serverWebAssets: {},
     tag: "v0.0.21",
     version: "0.0.21",
+    vscodeVersion: "1.121.0",
   },
   {
     assets: {
@@ -482,6 +494,7 @@ export const releases = [
     serverWebAssets: {},
     tag: "v0.0.20",
     version: "0.0.20",
+    vscodeVersion: "1.121.0",
   },
   {
     assets: {},
@@ -490,6 +503,7 @@ export const releases = [
     serverWebAssets: {},
     tag: "v0.0.19",
     version: "0.0.19",
+    vscodeVersion: "1.121.0",
   },
 ] as const;
 
