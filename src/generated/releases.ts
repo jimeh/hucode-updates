@@ -5,6 +5,52 @@ export const releases = [
     assets: {
       "darwin-arm64": {
         updateUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.32/hucode-darwin-arm64.zip",
+        updateSha256:
+          "2dd17ec4045cc6edd79c404ec4d46beb61c2b31ab6655fca0279adc7ea161205",
+        updateSize: 288478859,
+        downloadUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.32/hucode-darwin-arm64.dmg",
+        downloadSha256:
+          "ff80e293d991e48ac9adb0db2cbb038cd6ceba9aa4dccefee23b1c2e4276ce25",
+        downloadSize: 211221629,
+      },
+      darwin: {
+        updateUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.32/hucode-darwin-x64.zip",
+        updateSha256:
+          "163c28b1b5933abaf8fe0b1606bbe6a8e399d5004e464ae351a1419d7a56cee3",
+        updateSize: 299949574,
+        downloadUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.32/hucode-darwin-x64.dmg",
+        downloadSha256:
+          "cee2bd3b75f23d1aad7b51aa414ec64120e84f91a40d8bbb95271dd13f5faa36",
+        downloadSize: 227630816,
+      },
+    },
+    commit: "006ad6478f8affa04343ab19b08d2ad97dd324f2",
+    publishedAt: "2026-06-18T10:14:40Z",
+    serverWebAssets: {
+      "server-darwin-arm64-web": {
+        url: "https://github.com/jimeh/hucode/releases/download/v0.0.32/hucode-server-darwin-arm64-web.zip",
+        sha256:
+          "ebea743f424484a58d0dc048d14c9609e26e338fa0e5c795883cdd343e165423",
+        size: 159053886,
+      },
+      "server-darwin-web": {
+        url: "https://github.com/jimeh/hucode/releases/download/v0.0.32/hucode-server-darwin-x64-web.zip",
+        sha256:
+          "801af1fed7f6072f60ca2b9495e82a1eb44cc6b9cbbe850b41d8f96c0520a57c",
+        size: 162523050,
+      },
+    },
+    tag: "v0.0.32",
+    version: "0.0.32",
+  },
+  {
+    assets: {
+      "darwin-arm64": {
+        updateUrl:
           "https://github.com/jimeh/hucode/releases/download/v0.0.31/hucode-darwin-arm64.zip",
         updateSha256:
           "2ff25d858788baeba868fbacf047361497740e6341c9d102682db73598a3a6cf",
