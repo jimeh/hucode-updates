@@ -5,6 +5,53 @@ export const releases = [
     assets: {
       "darwin-arm64": {
         updateUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.34/hucode-darwin-arm64.zip",
+        updateSha256:
+          "4d4a7b17cc781d00e98cf916630500cc82e40fab7a25bb0a134185e4311ae539",
+        updateSize: 288480015,
+        downloadUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.34/hucode-darwin-arm64.dmg",
+        downloadSha256:
+          "33c5baeda31cbdb6440b74ad0b2f2727bbe262b279a1706956484cf16cc19a9c",
+        downloadSize: 211213081,
+      },
+      darwin: {
+        updateUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.34/hucode-darwin-x64.zip",
+        updateSha256:
+          "031c66fe1a54be1c9574bc75d66a90d9d0abec84a83d2d715fcacd246dd15646",
+        updateSize: 299948593,
+        downloadUrl:
+          "https://github.com/jimeh/hucode/releases/download/v0.0.34/hucode-darwin-x64.dmg",
+        downloadSha256:
+          "d23158bbae706bda997c97241673aeb18a853f98f8f9533628044054c71c7d82",
+        downloadSize: 227626601,
+      },
+    },
+    commit: "fcb87139a37bef768e83fb2915b09f7ae2280266",
+    publishedAt: "2026-06-21T20:35:47Z",
+    serverWebAssets: {
+      "server-darwin-arm64-web": {
+        url: "https://github.com/jimeh/hucode/releases/download/v0.0.34/hucode-server-darwin-arm64-web.zip",
+        sha256:
+          "69c799093e581100de2599f9250d797445c06fe26cf2952e5df1dcca96967e29",
+        size: 159053868,
+      },
+      "server-darwin-web": {
+        url: "https://github.com/jimeh/hucode/releases/download/v0.0.34/hucode-server-darwin-x64-web.zip",
+        sha256:
+          "2a75704000a048ca14d4c9214393b86d6e7261b207daed1b051e2fd46cbde839",
+        size: 162523028,
+      },
+    },
+    tag: "v0.0.34",
+    version: "0.0.34",
+    vscodeVersion: "1.125.0",
+  },
+  {
+    assets: {
+      "darwin-arm64": {
+        updateUrl:
           "https://github.com/jimeh/hucode/releases/download/v0.0.33/hucode-darwin-arm64.zip",
         updateSha256:
           "2c9d1ac132402caa682980a54d61548c0e39087688bd2c6c953717adfe0619ff",
