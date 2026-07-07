@@ -2,6 +2,43 @@
   {
     "assets": {
       "darwin-arm64": {
+        "updateUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.38/hucode-darwin-arm64.zip",
+        "updateSha256": "d2914b7d0ca324bacb0b47a14c24507fb1d2ba00752432b83c38c1f3c6cf2891",
+        "updateSize": 288475235,
+        "downloadUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.38/hucode-darwin-arm64.dmg",
+        "downloadSha256": "bc12368c84cc8c05de00e56a0dcf2a08a42aeeb01ac22e8c4e2f896daafaa8e5",
+        "downloadSize": 211125557
+      },
+      "darwin": {
+        "updateUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.38/hucode-darwin-x64.zip",
+        "updateSha256": "4a90efb3aa09247513ee000075e825cd632211f813fa010b248351d82dc88255",
+        "updateSize": 299937922,
+        "downloadUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.38/hucode-darwin-x64.dmg",
+        "downloadSha256": "76e48f5fb175b9d08aed0c73e4b7f9233343a44608a28e0bdbff68505fb559fa",
+        "downloadSize": 227619249
+      }
+    },
+    "commit": "160bbd4a7c47c54cd19aeb1d097be4c269463dac",
+    "publishedAt": "2026-07-07T01:44:05Z",
+    "serverWebAssets": {
+      "server-darwin-arm64-web": {
+        "url": "https://github.com/jimeh/hucode/releases/download/v0.0.38/hucode-server-darwin-arm64-web.zip",
+        "sha256": "c5bcd95ae52369ded2af864ee3defcef0a158deec8ae1b3b41ba88719b415d1e",
+        "size": 159193798
+      },
+      "server-darwin-web": {
+        "url": "https://github.com/jimeh/hucode/releases/download/v0.0.38/hucode-server-darwin-x64-web.zip",
+        "sha256": "b08e881e54e829574b3ae3aa7f3debc52a27e02556b0e942d54f7a2f3818ab09",
+        "size": 162662956
+      }
+    },
+    "tag": "v0.0.38",
+    "version": "0.0.38",
+    "vscodeVersion": "1.125.0"
+  },
+  {
+    "assets": {
+      "darwin-arm64": {
         "updateUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.37/hucode-darwin-arm64.zip",
         "updateSha256": "d07479e265bf631f0fdc1a6a2205380aeb9b4ef493af2bcbafccff0250f0ba17",
         "updateSize": 288480314,
