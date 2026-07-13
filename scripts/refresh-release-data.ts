@@ -70,10 +70,16 @@ export type ServerWebAsset = {
 };
 
 /**
+ * Standalone Hucode CLI archive metadata for one update platform.
+ */
+export type CliAsset = ServerWebAsset;
+
+/**
  * Generated release metadata consumed by static assets and Worker fallback.
  */
 export type Release = {
   assets: Record<string, PlatformAsset>;
+  cliAssets: Record<string, CliAsset>;
   commit: string;
   publishedAt: string;
   serverWebAssets: Record<string, ServerWebAsset>;
@@ -230,19 +236,44 @@ export function downloadPlatform(assetName: string): string | undefined {
  * Maps CLI server-web ZIP asset names to update platform identifiers.
  */
 export function serverWebPlatform(assetName: string): string | undefined {
-  const match = /^hucode-server-darwin-(?<arch>x64|arm64)-web\.zip$/.exec(
-    assetName,
-  );
+  const match =
+    /^hucode-server-(?<os>darwin|linux|win32)-(?<arch>x64|arm64)-web\.zip$/.exec(
+      assetName,
+    );
+  const os = match?.groups?.os;
   const arch = match?.groups?.arch;
-  if (!arch) {
+  if (!os || !arch) {
     return undefined;
   }
 
-  if (arch === "x64") {
+  if (os === "darwin" && arch === "x64") {
     return "server-darwin-web";
   }
 
-  return "server-darwin-arm64-web";
+  return `server-${os}-${arch}-web`;
+}
+
+/**
+ * Maps standalone CLI archive names to VS Code CLI platform identifiers.
+ */
+export function cliPlatform(assetName: string): string | undefined {
+  const match =
+    /^hucode-cli-(?<os>darwin|linux|win32)-(?<arch>x64|arm64)(?<extension>\.zip|\.tar\.gz)$/.exec(
+      assetName,
+    );
+  const os = match?.groups?.os;
+  const arch = match?.groups?.arch;
+  const extension = match?.groups?.extension;
+  if (!os || !arch || !extension) {
+    return undefined;
+  }
+
+  const expectedExtension = os === "linux" ? ".tar.gz" : ".zip";
+  if (extension !== expectedExtension) {
+    return undefined;
+  }
+
+  return `cli-${os}-${arch}`;
 }
 
 /**
@@ -386,6 +417,28 @@ export function serverWebAssets(
 }
 
 /**
+ * Builds per-platform standalone CLI metadata from release assets.
+ */
+export function cliAssets(assets: GitHubAsset[]): Record<string, CliAsset> {
+  const platforms: Record<string, CliAsset> = {};
+
+  for (const asset of assets) {
+    const platform = cliPlatform(asset.name);
+    if (!platform) {
+      continue;
+    }
+
+    platforms[platform] = {
+      url: asset.browser_download_url,
+      sha256: sha256(asset.digest),
+      size: asset.size,
+    };
+  }
+
+  return platforms;
+}
+
+/**
  * Fetches all GitHub releases for the upstream Hucode repository.
  */
 export async function fetchGitHubReleases(): Promise<GitHubRelease[]> {
@@ -461,6 +514,7 @@ async function releases(): Promise<ReleaseWithNotes[]> {
 
     resolved.push({
       assets: platformAssets(release.assets),
+      cliAssets: cliAssets(release.assets),
       commit,
       publishedAt: release.published_at,
       releaseNotes: release.body ?? "",
@@ -499,7 +553,7 @@ export function updateResponse(latest: Release, platform: string): unknown {
 /**
  * Builds a Hucode CLI-compatible version lookup response.
  */
-export function serverWebVersionResponse(release: Release): unknown {
+export function versionResponse(release: Release): unknown {
   return {
     version: release.commit,
     name: release.version,
@@ -529,6 +583,13 @@ async function writeGeneratedSource(
       "export const latestRelease = releases[0];",
       "export const validPlatforms = Object.keys(latestRelease.assets);",
       [
+        "export const validCliPlatforms = Array.from(",
+        "  new Set(releases.flatMap(",
+        "    (release) => Object.keys(release.cliAssets),",
+        "  )),",
+        ").sort();",
+      ].join("\n"),
+      [
         "export const validServerWebPlatforms = Array.from(",
         "  new Set(releases.flatMap(",
         "    (release) => Object.keys(release.serverWebAssets),",
@@ -547,6 +608,7 @@ async function writeGeneratedSource(
 function releaseMetadata(release: ReleaseWithNotes): Release {
   return {
     assets: release.assets,
+    cliAssets: release.cliAssets,
     commit: release.commit,
     publishedAt: release.publishedAt,
     serverWebAssets: release.serverWebAssets,
@@ -557,15 +619,19 @@ function releaseMetadata(release: ReleaseWithNotes): Release {
 }
 
 /**
- * Finds the newest release for each server-web platform.
+ * Finds the newest release for each CLI or server-web platform.
  *
  * Assumes releases are sorted newest-first; the first platform match wins.
  */
-function latestServerWebReleases(releases: Release[]): Record<string, Release> {
+function latestDownloadReleases(releases: Release[]): Record<string, Release> {
   const latestByPlatform: Record<string, Release> = {};
 
   for (const release of releases) {
-    for (const platform of Object.keys(release.serverWebAssets)) {
+    const platforms = [
+      ...Object.keys(release.cliAssets),
+      ...Object.keys(release.serverWebAssets),
+    ];
+    for (const platform of platforms) {
       latestByPlatform[platform] ??= release;
     }
   }
@@ -621,19 +687,23 @@ export async function refresh(options: RefreshOptions = {}): Promise<void> {
     );
   }
 
-  const knownServerWebLatest = latestServerWebReleases(knownReleaseMetadata);
-  for (const [platform, release] of Object.entries(knownServerWebLatest)) {
+  const knownDownloadLatest = latestDownloadReleases(knownReleaseMetadata);
+  for (const [platform, release] of Object.entries(knownDownloadLatest)) {
     await writeJson(
       path.join(latestRoot, platform, "stable"),
-      serverWebVersionResponse(release),
+      versionResponse(release),
     );
   }
 
   for (const release of knownReleaseMetadata) {
-    for (const platform of Object.keys(release.serverWebAssets)) {
+    const platforms = [
+      ...Object.keys(release.cliAssets),
+      ...Object.keys(release.serverWebAssets),
+    ];
+    for (const platform of platforms) {
       await writeJson(
         path.join(versionsRoot, release.version, platform, "stable"),
-        serverWebVersionResponse(release),
+        versionResponse(release),
       );
     }
   }

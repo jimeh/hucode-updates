@@ -5,6 +5,7 @@ import { describe, test } from "node:test";
 import {
   latestRelease,
   releases,
+  validCliPlatforms,
   validServerWebPlatforms,
   validPlatforms,
 } from "../src/generated/releases.ts";
@@ -61,6 +62,7 @@ describe("server-web download fallback", () => {
       "/commit:server-web-commit/server-darwin-web/stable",
       [
         {
+          cliAssets: {},
           commit: "server-web-commit",
           serverWebAssets: {
             "server-darwin-web": {
@@ -79,6 +81,57 @@ describe("server-web download fallback", () => {
     );
   });
 
+  test("redirects cross-platform server-web commit downloads", () => {
+    const platforms = [
+      "server-linux-x64-web",
+      "server-linux-arm64-web",
+      "server-win32-x64-web",
+      "server-win32-arm64-web",
+    ];
+
+    for (const platform of platforms) {
+      const url = `https://downloads.example.com/${platform}.zip`;
+      const response = commitDownloadResponse(
+        `/commit:server-web-commit/${platform}/stable`,
+        [
+          {
+            cliAssets: {},
+            commit: "server-web-commit",
+            serverWebAssets: { [platform]: { url } },
+          },
+        ],
+      );
+
+      assert.ok(response);
+      assert.equal(response.status, 302);
+      assert.equal(response.headers.get("Location"), url);
+    }
+  });
+
+  test("redirects commit downloads to generated CLI archives", () => {
+    const response = commitDownloadResponse(
+      "/commit:cli-commit/cli-linux-arm64/stable",
+      [
+        {
+          cliAssets: {
+            "cli-linux-arm64": {
+              url: "https://downloads.example.com/cli-linux-arm64.tar.gz",
+            },
+          },
+          commit: "cli-commit",
+          serverWebAssets: {},
+        },
+      ],
+    );
+
+    assert.ok(response);
+    assert.equal(response.status, 302);
+    assert.equal(
+      response.headers.get("Location"),
+      "https://downloads.example.com/cli-linux-arm64.tar.gz",
+    );
+  });
+
   test("rejects malformed or unavailable commit downloads", () => {
     const invalidPaths = [
       "/commit:server-web-commit/server-darwin-web/insider",
@@ -88,6 +141,7 @@ describe("server-web download fallback", () => {
     ];
     const knownReleases = [
       {
+        cliAssets: {},
         commit: "server-web-commit",
         serverWebAssets: {
           "server-darwin-web": {
@@ -125,9 +179,29 @@ describe("generated update assets", () => {
     }
   });
 
+  test("keeps CLI platforms separate from desktop update platforms", () => {
+    for (const platform of validCliPlatforms) {
+      assert.equal(validPlatforms.includes(platform), false);
+    }
+  });
+
   test("generates optional server-web release metadata", async () => {
     for (const release of releases) {
+      assert.ok("cliAssets" in release);
       assert.ok("serverWebAssets" in release);
+
+      for (const platform of Object.keys(release.cliAssets)) {
+        const responsePath = `public/api/versions/${release.version}/${platform}/stable`;
+        const response = JSON.parse(
+          await fs.readFile(responsePath, "utf8"),
+        ) as {
+          name?: string;
+          version?: string;
+        };
+
+        assert.equal(response.name, release.version);
+        assert.equal(response.version, release.commit);
+      }
 
       for (const platform of Object.keys(release.serverWebAssets)) {
         const responsePath = `public/api/versions/${release.version}/${platform}/stable`;

@@ -81,6 +81,9 @@ in `src/generated/releases.ts` or the public release JSON metadata.
 
 - Keep static assets asset-first. The Worker exists only for the update fallback
   contract that static headers cannot express.
+- Keep CLI and server-web latest/version responses to `name` and `version`.
+  The CLI resolves release metadata there, then downloads through the
+  `/commit:{sha}/{platform}/{quality}` Worker redirect.
 - Preserve `public/_headers` content types when adding static asset families.
 - Do not pin tests to a specific live latest release version. Assert shape and
   consistency instead.

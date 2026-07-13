@@ -5,6 +5,8 @@ import path from "node:path";
 import { describe, test } from "node:test";
 
 import {
+  cliAssets,
+  cliPlatform,
   downloadPlatform,
   fetchGitHubReleases,
   githubHeaders,
@@ -14,10 +16,10 @@ import {
   refresh,
   serverWebAssets,
   serverWebPlatform,
-  serverWebVersionResponse,
   sha256,
   updatePlatform,
   updateResponse,
+  versionResponse,
   type GitHubAsset,
   type GitHubRelease,
   type Release,
@@ -286,6 +288,34 @@ describe("platform asset mapping", () => {
       serverWebPlatform("hucode-server-darwin-x64-web.zip"),
       "server-darwin-web",
     );
+    assert.equal(
+      serverWebPlatform("hucode-server-linux-x64-web.zip"),
+      "server-linux-x64-web",
+    );
+    assert.equal(
+      serverWebPlatform("hucode-server-linux-arm64-web.zip"),
+      "server-linux-arm64-web",
+    );
+    assert.equal(
+      serverWebPlatform("hucode-server-win32-x64-web.zip"),
+      "server-win32-x64-web",
+    );
+    assert.equal(
+      serverWebPlatform("hucode-server-win32-arm64-web.zip"),
+      "server-win32-arm64-web",
+    );
+    assert.equal(
+      serverWebPlatform("hucode-server-linux-armhf-web.zip"),
+      undefined,
+    );
+    assert.equal(
+      serverWebPlatform("hucode-server-alpine-x64-web.zip"),
+      undefined,
+    );
+    assert.equal(
+      serverWebPlatform("hucode-server-win32-x86-web.zip"),
+      undefined,
+    );
     assert.equal(serverWebPlatform("hucode-darwin-arm64.zip"), undefined);
     assert.deepEqual(
       serverWebAssets([
@@ -308,6 +338,50 @@ describe("platform asset mapping", () => {
       },
     );
   });
+
+  test("maps standalone CLI archives to CLI update platforms", () => {
+    const digest =
+      "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+
+    assert.equal(cliPlatform("hucode-cli-darwin-x64.zip"), "cli-darwin-x64");
+    assert.equal(
+      cliPlatform("hucode-cli-darwin-arm64.zip"),
+      "cli-darwin-arm64",
+    );
+    assert.equal(cliPlatform("hucode-cli-linux-x64.tar.gz"), "cli-linux-x64");
+    assert.equal(
+      cliPlatform("hucode-cli-linux-arm64.tar.gz"),
+      "cli-linux-arm64",
+    );
+    assert.equal(cliPlatform("hucode-cli-win32-x64.zip"), "cli-win32-x64");
+    assert.equal(cliPlatform("hucode-cli-win32-arm64.zip"), "cli-win32-arm64");
+    assert.equal(cliPlatform("hucode-cli-linux-armhf.tar.gz"), undefined);
+    assert.equal(cliPlatform("hucode-cli-alpine-x64.tar.gz"), undefined);
+    assert.equal(cliPlatform("hucode-cli-win32-x86.zip"), undefined);
+    assert.equal(cliPlatform("hucode-cli-linux-x64.zip"), undefined);
+    assert.equal(cliPlatform("hucode-cli-darwin-x64.tar.gz"), undefined);
+
+    assert.deepEqual(
+      cliAssets([
+        asset("hucode-cli-linux-arm64.tar.gz", { digest, size: 10 }),
+        asset("hucode-cli-win32-x64.zip", { size: 20 }),
+        asset("hucode-server-linux-arm64-web.zip", { size: 30 }),
+      ]),
+      {
+        "cli-linux-arm64": {
+          url: "https://downloads.example.com/hucode-cli-linux-arm64.tar.gz",
+          sha256:
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          size: 10,
+        },
+        "cli-win32-x64": {
+          url: "https://downloads.example.com/hucode-cli-win32-x64.zip",
+          sha256: undefined,
+          size: 20,
+        },
+      },
+    );
+  });
 });
 
 describe("update response", () => {
@@ -320,6 +394,7 @@ describe("update response", () => {
         updateSize: 123,
       },
     },
+    cliAssets: {},
     commit: "abc123",
     publishedAt: "2026-05-28T20:47:29Z",
     serverWebAssets: {},
@@ -351,19 +426,20 @@ describe("update response", () => {
   });
 });
 
-describe("server-web version response", () => {
-  test("builds Hucode CLI version lookup payloads", () => {
-    const release: Release = {
-      assets: {},
-      commit: "abc123",
-      publishedAt: "2026-05-28T20:47:29Z",
-      serverWebAssets: {},
-      tag: "v1.2.3",
-      version: "1.2.3",
-      vscodeVersion: "1.125.0",
-    };
+describe("download version responses", () => {
+  const release: Release = {
+    assets: {},
+    cliAssets: {},
+    commit: "abc123",
+    publishedAt: "2026-05-28T20:47:29Z",
+    serverWebAssets: {},
+    tag: "v1.2.3",
+    version: "1.2.3",
+    vscodeVersion: "1.125.0",
+  };
 
-    assert.deepEqual(serverWebVersionResponse(release), {
+  test("builds Hucode CLI version lookup payloads", () => {
+    assert.deepEqual(versionResponse(release), {
       version: "abc123",
       name: "1.2.3",
     });
@@ -374,6 +450,7 @@ describe("refresh pipeline", () => {
   test("rejects a latest release with no update-capable assets", async () => {
     const latest: ReleaseWithNotes = {
       assets: {},
+      cliAssets: {},
       commit: "latest-commit",
       publishedAt: "2026-05-28T20:47:29Z",
       releaseNotes: "",
@@ -409,6 +486,7 @@ describe("refresh pipeline", () => {
           updateSize: 100,
         },
       },
+      cliAssets: {},
       commit: "latest-commit",
       publishedAt: "2026-05-28T20:47:29Z",
       releaseNotes: "## Latest\n\nLatest release notes.\n\n",
@@ -419,6 +497,7 @@ describe("refresh pipeline", () => {
     };
     const previous: ReleaseWithNotes = {
       assets: {},
+      cliAssets: {},
       commit: "previous-commit",
       publishedAt: "2026-05-27T20:47:29Z",
       releaseNotes: "## Previous\n\nPrevious release notes.",
@@ -469,7 +548,7 @@ describe("refresh pipeline", () => {
     await assert.rejects(fs.access(versionsRoot));
   });
 
-  test("writes server-web metadata for releases with web ZIPs", async () => {
+  test("writes CLI and server-web metadata for archive releases", async () => {
     const root = await fs.mkdtemp(path.join(tmpdir(), "hucode-updates-"));
     const latestRoot = path.join(root, "latest");
     const updateRoot = path.join(root, "update");
@@ -483,6 +562,14 @@ describe("refresh pipeline", () => {
         darwin: {
           updateUrl: "https://downloads.example.com/latest-darwin.zip",
           updateSize: 100,
+        },
+      },
+      cliAssets: {
+        "cli-linux-x64": {
+          url: "https://downloads.example.com/latest-cli.tar.gz",
+          sha256:
+            "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+          size: 150,
         },
       },
       commit: "latest-commit",
@@ -500,6 +587,14 @@ describe("refresh pipeline", () => {
     };
     const previous: ReleaseWithNotes = {
       assets: {},
+      cliAssets: {
+        "cli-win32-arm64": {
+          url: "https://downloads.example.com/previous-cli.zip",
+          sha256:
+            "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          size: 250,
+        },
+      },
       commit: "previous-commit",
       publishedAt: "2026-05-27T20:47:29Z",
       releaseNotes: "",
@@ -536,15 +631,42 @@ describe("refresh pipeline", () => {
         "utf8",
       ),
     ) as { name?: string; version?: string };
+    const latestCliLinux = JSON.parse(
+      await fs.readFile(
+        path.join(latestRoot, "cli-linux-x64", "stable"),
+        "utf8",
+      ),
+    ) as { name?: string; version?: string };
+    const latestCliWin32 = JSON.parse(
+      await fs.readFile(
+        path.join(latestRoot, "cli-win32-arm64", "stable"),
+        "utf8",
+      ),
+    ) as { name?: string; version?: string };
     const versionX64 = JSON.parse(
       await fs.readFile(
         path.join(versionsRoot, "1.2.3", "server-darwin-web", "stable"),
         "utf8",
       ),
     ) as { name?: string; version?: string };
+    const versionCliLinux = JSON.parse(
+      await fs.readFile(
+        path.join(versionsRoot, "1.2.3", "cli-linux-x64", "stable"),
+        "utf8",
+      ),
+    ) as { name?: string; version?: string };
+    const versionCliWin32 = JSON.parse(
+      await fs.readFile(
+        path.join(versionsRoot, "1.2.2", "cli-win32-arm64", "stable"),
+        "utf8",
+      ),
+    ) as { name?: string; version?: string };
     const current = JSON.parse(
       await fs.readFile(path.join(releasesRoot, "current.json"), "utf8"),
-    ) as { serverWebAssets?: Record<string, unknown> };
+    ) as {
+      cliAssets?: Record<string, unknown>;
+      serverWebAssets?: Record<string, unknown>;
+    };
     const generatedSource = await fs.readFile(generatedSourcePath, "utf8");
 
     assert.deepEqual(latestX64, {
@@ -555,11 +677,34 @@ describe("refresh pipeline", () => {
       version: previous.commit,
       name: previous.version,
     });
+    assert.deepEqual(latestCliLinux, {
+      version: latest.commit,
+      name: latest.version,
+    });
+    assert.deepEqual(latestCliWin32, {
+      version: previous.commit,
+      name: previous.version,
+    });
     assert.deepEqual(versionX64, {
       version: latest.commit,
       name: latest.version,
     });
+    assert.deepEqual(versionCliLinux, {
+      version: latest.commit,
+      name: latest.version,
+    });
+    assert.deepEqual(versionCliWin32, {
+      version: previous.commit,
+      name: previous.version,
+    });
+    assert.deepEqual(current.cliAssets?.["cli-linux-x64"], {
+      url: "https://downloads.example.com/latest-cli.tar.gz",
+      sha256:
+        "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      size: 150,
+    });
     assert.ok(current.serverWebAssets?.["server-darwin-web"]);
+    assert.match(generatedSource, /validCliPlatforms/);
     assert.match(generatedSource, /validServerWebPlatforms/);
     await assert.rejects(
       fs.access(

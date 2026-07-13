@@ -28,6 +28,7 @@ export const releases = [
         downloadSize: 248984901,
       },
     },
+    cliAssets: {},
     commit: "53f0e123dd414bb543098d9d3521944200e8106f",
     publishedAt: "2026-07-09T20:32:34Z",
     serverWebAssets: {
@@ -75,6 +76,7 @@ export const releases = [
         downloadSize: 248983774,
       },
     },
+    cliAssets: {},
     commit: "72f76be930e81135a42d578f066c867bb8392c8d",
     publishedAt: "2026-07-08T19:07:19Z",
     serverWebAssets: {
@@ -122,6 +124,7 @@ export const releases = [
         downloadSize: 244962897,
       },
     },
+    cliAssets: {},
     commit: "f8400cd3d7a0f0fb955dd1c93a1e3f431e55751f",
     publishedAt: "2026-07-07T13:24:30Z",
     serverWebAssets: {
@@ -169,6 +172,7 @@ export const releases = [
         downloadSize: 238962920,
       },
     },
+    cliAssets: {},
     commit: "7afab957e9968af6e61fca71485858a7a51d46ca",
     publishedAt: "2026-07-07T10:32:42Z",
     serverWebAssets: {
@@ -216,6 +220,7 @@ export const releases = [
         downloadSize: 227619249,
       },
     },
+    cliAssets: {},
     commit: "160bbd4a7c47c54cd19aeb1d097be4c269463dac",
     publishedAt: "2026-07-07T01:44:05Z",
     serverWebAssets: {
@@ -263,6 +268,7 @@ export const releases = [
         downloadSize: 227630929,
       },
     },
+    cliAssets: {},
     commit: "7e7b3228e9707579bccae583585a6b5431ebaf14",
     publishedAt: "2026-06-25T10:00:54Z",
     serverWebAssets: {
@@ -310,6 +316,7 @@ export const releases = [
         downloadSize: 227626220,
       },
     },
+    cliAssets: {},
     commit: "5d0f29337a1d97434d260a685438b1373e0f5dce",
     publishedAt: "2026-06-25T03:06:24Z",
     serverWebAssets: {
@@ -357,6 +364,7 @@ export const releases = [
         downloadSize: 227618944,
       },
     },
+    cliAssets: {},
     commit: "ceb19911279b95364a8b65dc296edb102dc7e44a",
     publishedAt: "2026-06-24T11:02:40Z",
     serverWebAssets: {
@@ -404,6 +412,7 @@ export const releases = [
         downloadSize: 227626601,
       },
     },
+    cliAssets: {},
     commit: "fcb87139a37bef768e83fb2915b09f7ae2280266",
     publishedAt: "2026-06-21T20:35:47Z",
     serverWebAssets: {
@@ -451,6 +460,7 @@ export const releases = [
         downloadSize: 227621613,
       },
     },
+    cliAssets: {},
     commit: "483f986eac06bf8599ec339a53c4ea6fa5328523",
     publishedAt: "2026-06-19T01:43:42Z",
     serverWebAssets: {
@@ -498,6 +508,7 @@ export const releases = [
         downloadSize: 227630816,
       },
     },
+    cliAssets: {},
     commit: "006ad6478f8affa04343ab19b08d2ad97dd324f2",
     publishedAt: "2026-06-18T10:14:40Z",
     serverWebAssets: {
@@ -545,6 +556,7 @@ export const releases = [
         downloadSize: 218151210,
       },
     },
+    cliAssets: {},
     commit: "4440f6fa0fb5c13c110a43b198912026b5d6c8ea",
     publishedAt: "2026-06-13T18:19:03Z",
     serverWebAssets: {
@@ -592,6 +604,7 @@ export const releases = [
         downloadSize: 218145737,
       },
     },
+    cliAssets: {},
     commit: "0ca41965bafbc407da8e393593fb2ac4fdeca290",
     publishedAt: "2026-06-11T03:57:14Z",
     serverWebAssets: {
@@ -614,6 +627,7 @@ export const releases = [
   },
   {
     assets: {},
+    cliAssets: {},
     commit: "142fd4fc2cbbdf0a3534b5c03f55162202415e0e",
     publishedAt: "2026-06-10T21:27:14Z",
     serverWebAssets: {},
@@ -648,6 +662,7 @@ export const releases = [
         downloadSize: 216866303,
       },
     },
+    cliAssets: {},
     commit: "933abc21d696f56f073ae28692ba35226d30d7bf",
     publishedAt: "2026-06-10T21:16:45Z",
     serverWebAssets: {
@@ -695,6 +710,7 @@ export const releases = [
         downloadSize: 216867871,
       },
     },
+    cliAssets: {},
     commit: "e701d53d65a37e9f904227ebaf359dce27ee2906",
     publishedAt: "2026-06-10T11:11:37Z",
     serverWebAssets: {
@@ -742,6 +758,7 @@ export const releases = [
         downloadSize: 216865764,
       },
     },
+    cliAssets: {},
     commit: "3a450adf24caef64d7776300ede0e57ddd44390c",
     publishedAt: "2026-06-09T22:09:30Z",
     serverWebAssets: {
@@ -789,6 +806,7 @@ export const releases = [
         downloadSize: 215553794,
       },
     },
+    cliAssets: {},
     commit: "c311feacedb2d03b971dc1a73568eb86823b89f1",
     publishedAt: "2026-06-08T16:34:39Z",
     serverWebAssets: {},
@@ -823,6 +841,7 @@ export const releases = [
         downloadSize: 215610355,
       },
     },
+    cliAssets: {},
     commit: "7b2737fbf06bb0b2088b911bd38682eb8d446f36",
     publishedAt: "2026-06-05T13:09:04Z",
     serverWebAssets: {},
@@ -857,6 +876,7 @@ export const releases = [
         downloadSize: 208938387,
       },
     },
+    cliAssets: {},
     commit: "7768e2a4797aeb58953d3d5dd5428d6c7146691b",
     publishedAt: "2026-05-30T11:17:25Z",
     serverWebAssets: {},
@@ -891,6 +911,7 @@ export const releases = [
         downloadSize: 208931791,
       },
     },
+    cliAssets: {},
     commit: "5f104f7afc5e8fbed32357f9deae6aad24797e7e",
     publishedAt: "2026-05-30T01:54:42Z",
     serverWebAssets: {},
@@ -925,6 +946,7 @@ export const releases = [
         downloadSize: 194818079,
       },
     },
+    cliAssets: {},
     commit: "df3fa28c5274f23d5d826850886f632668c29a93",
     publishedAt: "2026-05-29T03:36:51Z",
     serverWebAssets: {},
@@ -959,6 +981,7 @@ export const releases = [
         downloadSize: 194573444,
       },
     },
+    cliAssets: {},
     commit: "06f666744e3312d81e281b4afc9844b0226774f6",
     publishedAt: "2026-05-28T20:47:29Z",
     serverWebAssets: {},
@@ -968,6 +991,7 @@ export const releases = [
   },
   {
     assets: {},
+    cliAssets: {},
     commit: "17f2c1bc4e5dad92df0be886c6cf4f1f5a0ccdeb",
     publishedAt: "2026-05-26T20:50:16Z",
     serverWebAssets: {},
@@ -979,6 +1003,9 @@ export const releases = [
 
 export const latestRelease = releases[0];
 export const validPlatforms = Object.keys(latestRelease.assets);
+export const validCliPlatforms = Array.from(
+  new Set(releases.flatMap((release) => Object.keys(release.cliAssets))),
+).sort();
 export const validServerWebPlatforms = Array.from(
   new Set(releases.flatMap((release) => Object.keys(release.serverWebAssets))),
 ).sort();
