@@ -11,7 +11,8 @@ const NO_UPDATE_HEADERS = {
   "Cache-Control": "public, max-age=300",
 };
 
-type ServerWebRelease = {
+type DownloadRelease = {
+  cliAssets: Record<string, { url: string }>;
   commit: string;
   serverWebAssets: Record<string, { url: string }>;
 };
@@ -41,19 +42,21 @@ function updateNoResponse(pathname: string): Response | undefined {
   });
 }
 
-function serverWebAssetUrl(
+function downloadAssetUrl(
   commit: string,
   platform: string,
-  knownReleases: readonly ServerWebRelease[] = releases,
+  knownReleases: readonly DownloadRelease[] = releases,
 ): string | undefined {
   const release = knownReleases.find((release) => release.commit === commit);
 
-  return release?.serverWebAssets[platform]?.url;
+  return (
+    release?.cliAssets[platform]?.url ?? release?.serverWebAssets[platform]?.url
+  );
 }
 
 export function commitDownloadResponse(
   pathname: string,
-  knownReleases: readonly ServerWebRelease[] = releases,
+  knownReleases: readonly DownloadRelease[] = releases,
 ): Response | undefined {
   const match = COMMIT_DOWNLOAD_PATH.exec(pathname);
   const groups = match?.groups;
@@ -66,7 +69,7 @@ export function commitDownloadResponse(
     return undefined;
   }
 
-  const url = serverWebAssetUrl(commit, platform, knownReleases);
+  const url = downloadAssetUrl(commit, platform, knownReleases);
   if (!url) {
     return undefined;
   }
