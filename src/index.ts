@@ -17,7 +17,10 @@ type DownloadRelease = {
   serverWebAssets: Record<string, { url: string }>;
 };
 
-function updateNoResponse(pathname: string): Response | undefined {
+export function updateNoResponse(
+  pathname: string,
+  validPlatforms: ReadonlySet<string> = VALID_PLATFORMS,
+): Response | undefined {
   const match = UPDATE_PATH.exec(pathname);
   const groups = match?.groups;
   if (!groups) {
@@ -27,7 +30,7 @@ function updateNoResponse(pathname: string): Response | undefined {
   const { commit, platform, quality } = groups;
   const isValid = Boolean(
     platform &&
-    VALID_PLATFORMS.has(platform) &&
+    validPlatforms.has(platform) &&
     quality === VALID_QUALITY &&
     commit,
   );

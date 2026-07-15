@@ -28,6 +28,7 @@ export type GitHubRelease = {
   assets: GitHubAsset[];
   body: string | null;
   draft: boolean;
+  html_url: string;
   prerelease: boolean;
   published_at: string;
   tag_name: string;
@@ -186,7 +187,7 @@ export function sha256(digest: string | undefined): string | undefined {
  * Maps update ZIP asset names to VS Code update platform identifiers.
  */
 export function updatePlatform(assetName: string): string | undefined {
-  const match = /^hucode-(?<os>[a-z0-9]+)-(?<arch>[a-z0-9]+)\.zip$/.exec(
+  const match = /^hucode-(?<os>darwin|linux)-(?<arch>x64|arm64)\.zip$/.exec(
     assetName,
   );
   const groups = match?.groups;
@@ -204,7 +205,11 @@ export function updatePlatform(assetName: string): string | undefined {
     return "darwin-arm64";
   }
 
-  return `${os}-${arch}`;
+  if (os === "linux") {
+    return `linux-${arch}`;
+  }
+
+  return undefined;
 }
 
 /**
@@ -362,6 +367,7 @@ async function tagCommit(tag: string): Promise<string> {
  */
 export function platformAssets(
   assets: GitHubAsset[],
+  releasePageUrl: string,
 ): Record<string, PlatformAsset> {
   const platforms: Record<string, PlatformAsset> = {};
 
@@ -372,7 +378,9 @@ export function platformAssets(
     }
 
     platforms[platform] = {
-      updateUrl: asset.browser_download_url,
+      updateUrl: platform.startsWith("linux-")
+        ? releasePageUrl
+        : asset.browser_download_url,
       updateSha256: sha256(asset.digest),
       updateSize: asset.size,
     };
@@ -513,7 +521,7 @@ async function releases(): Promise<ReleaseWithNotes[]> {
     const versionInfo = await releaseVersionInfo(release, commit);
 
     resolved.push({
-      assets: platformAssets(release.assets),
+      assets: platformAssets(release.assets, release.html_url),
       cliAssets: cliAssets(release.assets),
       commit,
       publishedAt: release.published_at,

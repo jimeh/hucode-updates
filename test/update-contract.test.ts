@@ -9,7 +9,10 @@ import {
   validServerWebPlatforms,
   validPlatforms,
 } from "../src/generated/releases.ts";
-import worker, { commitDownloadResponse } from "../src/index.ts";
+import worker, {
+  commitDownloadResponse,
+  updateNoResponse,
+} from "../src/index.ts";
 
 const updateAssets = latestRelease.assets as Record<
   string,
@@ -39,9 +42,24 @@ describe("update fallback", () => {
     }
   });
 
+  test("returns no update for latest Linux builds", async () => {
+    const linuxPlatforms = new Set(["linux-x64", "linux-arm64"]);
+
+    for (const platform of linuxPlatforms) {
+      const response = updateNoResponse(
+        `/api/update/${platform}/stable/latest-commit`,
+        linuxPlatforms,
+      );
+
+      assert.ok(response);
+      assert.equal(response.status, 204);
+      assert.equal(await response.text(), "");
+    }
+  });
+
   test("rejects invalid update paths", () => {
     const invalidPaths = [
-      "/api/update/linux-x64/stable/abc123",
+      "/api/update/linux-armhf/stable/abc123",
       "/api/update/darwin/insider/abc123",
       "/api/update/darwin/stable",
       "/api/update/darwin/stable/abc123/extra",
