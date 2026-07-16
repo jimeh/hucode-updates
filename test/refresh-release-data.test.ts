@@ -47,6 +47,7 @@ function githubRelease(
     assets: [],
     body: null,
     draft: false,
+    html_url: `https://github.com/jimeh/hucode/releases/tag/${tag}`,
     prerelease: false,
     published_at: "2026-05-28T20:47:29Z",
     tag_name: tag,
@@ -229,6 +230,9 @@ describe("platform asset mapping", () => {
     assert.equal(updatePlatform("hucode-darwin-x64.zip"), "darwin");
     assert.equal(updatePlatform("hucode-darwin-arm64.zip"), "darwin-arm64");
     assert.equal(updatePlatform("hucode-linux-x64.zip"), "linux-x64");
+    assert.equal(updatePlatform("hucode-linux-arm64.zip"), "linux-arm64");
+    assert.equal(updatePlatform("hucode-linux-armhf.zip"), undefined);
+    assert.equal(updatePlatform("hucode-win32-x64.zip"), undefined);
     assert.equal(
       updatePlatform("hucode-server-darwin-arm64-web.zip"),
       undefined,
@@ -249,13 +253,17 @@ describe("platform asset mapping", () => {
       "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
     assert.deepEqual(
-      platformAssets([
-        asset("hucode-darwin-x64.zip", { digest, size: 10 }),
-        asset("hucode-darwin-x64.dmg", { digest, size: 20 }),
-        asset("hucode-linux-x64.zip", { size: 30 }),
-        asset("hucode-linux-x64.dmg", { size: 40 }),
-        asset("checksums.txt", { size: 50 }),
-      ]),
+      platformAssets(
+        [
+          asset("hucode-darwin-x64.zip", { digest, size: 10 }),
+          asset("hucode-darwin-x64.dmg", { digest, size: 20 }),
+          asset("hucode-linux-x64.zip", { size: 30 }),
+          asset("hucode-linux-arm64.zip", { digest, size: 40 }),
+          asset("hucode-linux-armhf.zip", { size: 50 }),
+          asset("checksums.txt", { size: 60 }),
+        ],
+        "https://github.com/jimeh/hucode/releases/tag/v1.2.3",
+      ),
       {
         darwin: {
           updateUrl: "https://downloads.example.com/hucode-darwin-x64.zip",
@@ -268,9 +276,15 @@ describe("platform asset mapping", () => {
           downloadSize: 20,
         },
         "linux-x64": {
-          updateUrl: "https://downloads.example.com/hucode-linux-x64.zip",
+          updateUrl: "https://github.com/jimeh/hucode/releases/tag/v1.2.3",
           updateSha256: undefined,
           updateSize: 30,
+        },
+        "linux-arm64": {
+          updateUrl: "https://github.com/jimeh/hucode/releases/tag/v1.2.3",
+          updateSha256:
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          updateSize: 40,
         },
       },
     );
@@ -418,6 +432,29 @@ describe("update response", () => {
     });
   });
 
+  test("uses the release page for manual Linux updates", () => {
+    const linuxRelease: Release = {
+      ...release,
+      assets: {
+        "linux-arm64": {
+          updateUrl: "https://github.com/jimeh/hucode/releases/tag/v1.2.3",
+          updateSha256:
+            "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          updateSize: 456,
+        },
+      },
+    };
+
+    const response = updateResponse(linuxRelease, "linux-arm64") as {
+      url?: string;
+    };
+
+    assert.equal(
+      response.url,
+      "https://github.com/jimeh/hucode/releases/tag/v1.2.3",
+    );
+  });
+
   test("rejects platforms missing from the latest release", () => {
     assert.throws(
       () => updateResponse(release, "darwin-arm64"),
@@ -546,6 +583,75 @@ describe("refresh pipeline", () => {
     );
     await assert.rejects(fs.access(latestRoot));
     await assert.rejects(fs.access(versionsRoot));
+  });
+
+  test("advertises Linux updates only to older builds", async () => {
+    const root = await fs.mkdtemp(path.join(tmpdir(), "hucode-updates-"));
+    const updateRoot = path.join(root, "update");
+    const generatedSourcePath = path.join(root, "generated", "releases.ts");
+    const releasePageUrl =
+      "https://github.com/jimeh/hucode/releases/tag/v1.2.3";
+    const latest: ReleaseWithNotes = {
+      assets: {
+        "linux-arm64": {
+          updateUrl: releasePageUrl,
+          updateSize: 200,
+        },
+        "linux-x64": {
+          updateUrl: releasePageUrl,
+          updateSize: 100,
+        },
+      },
+      cliAssets: {},
+      commit: "latest-commit",
+      publishedAt: "2026-05-28T20:47:29Z",
+      releaseNotes: "",
+      serverWebAssets: {},
+      tag: "v1.2.3",
+      version: "1.2.3",
+      vscodeVersion: "1.125.0",
+    };
+    const previous: ReleaseWithNotes = {
+      assets: {},
+      cliAssets: {},
+      commit: "previous-commit",
+      publishedAt: "2026-05-27T20:47:29Z",
+      releaseNotes: "",
+      serverWebAssets: {},
+      tag: "v1.2.2",
+      version: "1.2.2",
+      vscodeVersion: "1.124.0",
+    };
+
+    await refresh({
+      generatedSourcePath,
+      latestRoot: path.join(root, "latest"),
+      releaseProvider: () => Promise.resolve([latest, previous]),
+      releaseNotesRoot: path.join(root, "release-notes"),
+      releasesRoot: path.join(root, "releases"),
+      updateRoot,
+      versionsRoot: path.join(root, "versions"),
+    });
+
+    for (const platform of ["linux-x64", "linux-arm64"]) {
+      const response = JSON.parse(
+        await fs.readFile(
+          path.join(updateRoot, platform, "stable", previous.commit),
+          "utf8",
+        ),
+      ) as { hucodeVersion?: string; url?: string; version?: string };
+
+      assert.equal(response.hucodeVersion, latest.version);
+      assert.equal(response.version, latest.commit);
+      assert.equal(response.url, releasePageUrl);
+      await assert.rejects(
+        fs.access(path.join(updateRoot, platform, "stable", latest.commit)),
+      );
+    }
+
+    const generatedSource = await fs.readFile(generatedSourcePath, "utf8");
+    assert.match(generatedSource, /"linux-x64"/);
+    assert.match(generatedSource, /"linux-arm64"/);
   });
 
   test("writes CLI and server-web metadata for archive releases", async () => {
