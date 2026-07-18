@@ -177,8 +177,18 @@ describe("server-web download fallback", () => {
 });
 
 describe("generated update assets", () => {
-  test("derives valid platforms from latest release ZIP assets", () => {
-    assert.deepEqual([...validPlatforms].sort(), ["darwin", "darwin-arm64"]);
+  test("derives valid platforms from generated release metadata", async () => {
+    const currentRelease = JSON.parse(
+      await fs.readFile("public/api/releases/current.json", "utf8"),
+    ) as {
+      assets: Record<string, unknown>;
+    };
+
+    assert.ok(validPlatforms.length > 0);
+    assert.deepEqual(
+      [...validPlatforms].sort(),
+      Object.keys(currentRelease.assets).sort(),
+    );
     assert.match(latestRelease.version, /^\d+\.\d+\.\d+$/);
     assert.equal(latestRelease.tag, `v${latestRelease.version}`);
   });
