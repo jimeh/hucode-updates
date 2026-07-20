@@ -467,6 +467,55 @@ export async function fetchGitHubReleases(): Promise<GitHubRelease[]> {
   return githubReleases;
 }
 
+function releaseTagParts(release: GitHubRelease): [bigint, bigint, bigint] {
+  const [major, minor, patch] = releaseVersion(release.tag_name).split(".");
+  if (major === undefined || minor === undefined || patch === undefined) {
+    throw new Error(`Unsupported release tag: ${release.tag_name}`);
+  }
+
+  return [BigInt(major), BigInt(minor), BigInt(patch)];
+}
+
+function compareReleaseTagsDescending(
+  a: GitHubRelease,
+  b: GitHubRelease,
+): number {
+  const aParts = releaseTagParts(a);
+  const bParts = releaseTagParts(b);
+
+  for (const index of [0, 1, 2] as const) {
+    const aPart = aParts[index];
+    const bPart = bParts[index];
+    if (aPart === bPart) {
+      continue;
+    }
+
+    return aPart > bPart ? -1 : 1;
+  }
+
+  return 0;
+}
+
+/**
+ * Orders stable releases with GitHub's designated latest release first,
+ * followed by the remaining releases in descending semver order.
+ */
+export function stableReleases(
+  githubReleases: GitHubRelease[],
+  latestRelease: GitHubRelease,
+): GitHubRelease[] {
+  const previousReleases = githubReleases
+    .filter(
+      (release) =>
+        !release.draft &&
+        !release.prerelease &&
+        release.tag_name !== latestRelease.tag_name,
+    )
+    .sort(compareReleaseTagsDescending);
+
+  return [latestRelease, ...previousReleases];
+}
+
 /**
  * Resolves Hucode and VS Code versions for a GitHub release.
  */
@@ -509,11 +558,13 @@ export async function releaseVersionInfo(
 }
 
 async function releases(): Promise<ReleaseWithNotes[]> {
-  const githubReleases = await fetchGitHubReleases();
-
-  const stable = githubReleases
-    .filter((release) => !release.draft && !release.prerelease)
-    .sort((a, b) => b.published_at.localeCompare(a.published_at));
+  const [githubReleases, latestRelease] = await Promise.all([
+    fetchGitHubReleases(),
+    fetchJson<GitHubRelease>(
+      `https://api.github.com/repos/${REPO}/releases/latest`,
+    ),
+  ]);
+  const stable = stableReleases(githubReleases, latestRelease);
 
   const resolved: ReleaseWithNotes[] = [];
   for (const release of stable) {
@@ -575,7 +626,7 @@ async function writeJson(filePath: string, value: unknown): Promise<void> {
 
 async function writeMarkdown(filePath: string, value: string): Promise<void> {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
-  await fs.writeFile(filePath, `${value.trimEnd()}\n`);
+  await fs.writeFile(filePath, `${value.replace(/\r\n?/g, "\n").trimEnd()}\n`);
 }
 
 async function writeGeneratedSource(

@@ -17,6 +17,7 @@ import {
   serverWebAssets,
   serverWebPlatform,
   sha256,
+  stableReleases,
   updatePlatform,
   updateResponse,
   versionResponse,
@@ -222,6 +223,27 @@ describe("GitHub release fetching", () => {
     } finally {
       globalThis.fetch = originalFetch;
     }
+  });
+});
+
+describe("GitHub release ordering", () => {
+  test("uses GitHub's latest release then descending semver", () => {
+    const latest = githubRelease("v0.0.51", {
+      published_at: "2026-07-20T02:59:14Z",
+    });
+    const laterPublished = githubRelease("v0.0.9", {
+      published_at: "2026-07-20T08:11:23Z",
+    });
+    const higherVersion = githubRelease("v0.0.10", {
+      published_at: "2026-07-19T20:48:19Z",
+    });
+
+    assert.deepEqual(
+      stableReleases([latest, laterPublished, higherVersion], latest).map(
+        (release) => release.tag_name,
+      ),
+      ["v0.0.51", "v0.0.10", "v0.0.9"],
+    );
   });
 });
 
@@ -526,7 +548,7 @@ describe("refresh pipeline", () => {
       cliAssets: {},
       commit: "latest-commit",
       publishedAt: "2026-05-28T20:47:29Z",
-      releaseNotes: "## Latest\n\nLatest release notes.\n\n",
+      releaseNotes: "## Latest\r\n\r\nLatest release notes.\r\n\r\n",
       serverWebAssets: {},
       tag: "v1.2.3",
       version: "1.2.3",

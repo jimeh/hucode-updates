@@ -51,6 +51,11 @@ rate limits. The refresh workflow uses a GitHub App token from
 `RELEASE_BOT_CLIENT_ID` and `RELEASE_BOT_PRIVATE_KEY`; keep that app-token
 pattern for workflow auth.
 
+Treat GitHub's `/releases/latest` response as authoritative for the latest
+stable release. Publication timestamps can be out of order when release
+workflows are delayed or releases are manually re-designated as latest. Order
+the remaining stable releases by semver rather than publication time.
+
 `pnpm refresh` should be the only normal way to update these generated paths:
 
 - `public/api/releases/*`
@@ -76,6 +81,9 @@ release bodies:
 Use version-only names like `0.0.24.md`, not tag names like `v0.0.24.md`.
 Release note bodies should stay in `public/release-notes/*`; do not embed them
 in `src/generated/releases.ts` or the public release JSON metadata.
+Normalize release-note line endings when generating these files because GitHub
+release edits can return CRLF content and formatting checks run before Git line
+ending normalization.
 
 ## Constraints
 
