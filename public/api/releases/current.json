@@ -1,99 +1,99 @@
 {
   "assets": {
     "darwin-arm64": {
-      "updateUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.59/hucode-darwin-arm64.zip",
-      "updateSha256": "4abaebabc2dbf1577cd3830a166887defd7be8daa85d28a818c1d6df9aa1bfe4",
-      "updateSize": 350285329,
-      "downloadUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.59/hucode-darwin-arm64.dmg",
-      "downloadSha256": "6d261ceb2548c14baeb75e4c734e4cdf816f13fdf1ef242c62cb1ef6cd5e9f2c",
-      "downloadSize": 256273040
+      "updateUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.60/hucode-darwin-arm64.zip",
+      "updateSha256": "623b2e5ff4d5eea72c792b782b83cdf5693a1688dadec7bceba018ad6c49b365",
+      "updateSize": 350270950,
+      "downloadUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.60/hucode-darwin-arm64.dmg",
+      "downloadSha256": "59f5fab721fafb51842f2fba5d46c899ae2a11f4b3e718c685c9af77f83e5d02",
+      "downloadSize": 256254190
     },
     "darwin": {
-      "updateUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.59/hucode-darwin-x64.zip",
-      "updateSha256": "e455fd9a0ac0fed7f01548480fe14138f9ec9a6fa9d7a8843854f8ab3ba7a0f6",
-      "updateSize": 359194408,
-      "downloadUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.59/hucode-darwin-x64.dmg",
-      "downloadSha256": "50357a96defa0439f19f535b6c75997d5598753ae63329bb87dfabb3b83f3489",
-      "downloadSize": 274133423
+      "updateUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.60/hucode-darwin-x64.zip",
+      "updateSha256": "35aa14cd0db3c9ccfae4b96fcc60af41382e499b400f7681571f6c7dfb2fbc57",
+      "updateSize": 359202556,
+      "downloadUrl": "https://github.com/jimeh/hucode/releases/download/v0.0.60/hucode-darwin-x64.dmg",
+      "downloadSha256": "c9f6798cf992b19145ce440218840746464fc454b2c8f6adb829c677ecea35d4",
+      "downloadSize": 274014511
     },
     "linux-arm64": {
-      "updateUrl": "https://github.com/jimeh/hucode/releases/tag/v0.0.59",
-      "updateSha256": "f1149b0d317ea5988463a7346a123f552db74ee5a93964991c600e9d8dac3f37",
-      "updateSize": 357445871
+      "updateUrl": "https://github.com/jimeh/hucode/releases/tag/v0.0.60",
+      "updateSha256": "5d60dc577e74d3aa7f6e4fd8c5ba0ebbfe147230f82657aa75093a926b2ddf1a",
+      "updateSize": 357456725
     },
     "linux-x64": {
-      "updateUrl": "https://github.com/jimeh/hucode/releases/tag/v0.0.59",
-      "updateSha256": "73ba521773802ee0535bfa38df600d340fe65db803d7d7c43fd51c7f80c7057c",
-      "updateSize": 568850433
+      "updateUrl": "https://github.com/jimeh/hucode/releases/tag/v0.0.60",
+      "updateSha256": "8af16a0b1a45d1c7728c6aaab2b08df71ee6f9b02d8b3d4021f05e185d2b4456",
+      "updateSize": 568864644
     }
   },
   "cliAssets": {
     "cli-darwin-arm64": {
-      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.59/hucode-cli-darwin-arm64.zip",
-      "sha256": "06a3669ae5ff53211c57a99243652b2557abd60f514dd28bd596b58e22f2bc1a",
-      "size": 8681220
+      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.60/hucode-cli-darwin-arm64.zip",
+      "sha256": "ff3b48e25003c31a14cfba0b0d08e6392eaa2e22943cdd6d50461ef87f0d79b0",
+      "size": 8681210
     },
     "cli-darwin-x64": {
-      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.59/hucode-cli-darwin-x64.zip",
-      "sha256": "580e866a8f7992c3418059ab559a98b6a8f19cd375b7d8e901f140692c52a95d",
-      "size": 9343307
+      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.60/hucode-cli-darwin-x64.zip",
+      "sha256": "f6fdb006f3d9ee7166cfd6cea3a6e310f100d3f38d6f04115bca8c51b41911d9",
+      "size": 9343317
     },
     "cli-linux-arm64": {
-      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.59/hucode-cli-linux-arm64.tar.gz",
-      "sha256": "9a1e22de131c893a993755195b83ff974d5804d90ba1d98158f437ca15d4e25b",
-      "size": 11065759
+      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.60/hucode-cli-linux-arm64.tar.gz",
+      "sha256": "2bd697327e3d6fb90b1ce24e5ebc75bda08784044cbf23d4bcf4d622bdb92f72",
+      "size": 11065749
     },
     "cli-linux-x64": {
-      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.59/hucode-cli-linux-x64.tar.gz",
-      "sha256": "e82f18467422c6c368039d939137cb4368df15a63cd2382357ebbf5d1361d81a",
-      "size": 11718053
+      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.60/hucode-cli-linux-x64.tar.gz",
+      "sha256": "155c8df87f13313369ed46dc3e5ad6708f43d35b4c9c03fb5e03c3c57abdff6c",
+      "size": 11717878
     },
     "cli-win32-arm64": {
-      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.59/hucode-cli-win32-arm64.zip",
-      "sha256": "cb62aec3e2d07fa7c82ca6a44360e6bcc5a15dd3f21d1db653e2488c41077198",
+      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.60/hucode-cli-win32-arm64.zip",
+      "sha256": "119234579c24a22b7933900c94a12e1db5025f98ac7a6ed5699f6a8690999622",
       "size": 9076634
     },
     "cli-win32-x64": {
-      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.59/hucode-cli-win32-x64.zip",
-      "sha256": "93a9880c192e93596d617bbc17daf7eca98be54dd7b6a4d80b654ec370b7d20f",
-      "size": 10172874
+      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.60/hucode-cli-win32-x64.zip",
+      "sha256": "912beef993d68ee508b63b29fd8b11896eaac9e79dbb08c9903ad616bb52dba2",
+      "size": 10172875
     }
   },
-  "commit": "975ded03410d9f6af5600e697cedd4b079d5e4ed",
-  "publishedAt": "2026-07-28T17:26:26Z",
+  "commit": "2596ba03a55c7db178614ea347300202eb1dba6f",
+  "publishedAt": "2026-07-30T16:00:19Z",
   "serverWebAssets": {
     "server-darwin-arm64-web": {
-      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.59/hucode-server-darwin-arm64-web.zip",
-      "sha256": "a311c4b6cbd1d59d23eec68fea885d361dcd4957876f59059c02ea38508236e3",
-      "size": 203157155
+      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.60/hucode-server-darwin-arm64-web.zip",
+      "sha256": "a5ecc64b9f13dcbef1c678d917f7ecfef3783362135674cf9368988d714e1ac3",
+      "size": 203169339
     },
     "server-darwin-web": {
-      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.59/hucode-server-darwin-x64-web.zip",
-      "sha256": "72400952057d429c0dafa91b2d0fa316fae4e98acd9f858ac5594bb319f49701",
-      "size": 219049790
+      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.60/hucode-server-darwin-x64-web.zip",
+      "sha256": "8dfb85575b7424aa9b298cc3d001086b3b2084018a30a7d453abfd40c98a802f",
+      "size": 219061949
     },
     "server-linux-arm64-web": {
-      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.59/hucode-server-linux-arm64-web.zip",
-      "sha256": "b78c708c2a30b4f8160bd760d7f00e9f072fe2184d61d7a57087f1efec530cd8",
-      "size": 220611875
+      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.60/hucode-server-linux-arm64-web.zip",
+      "sha256": "29ebce2ec2d77fa48f1d88a0a2906a421bd9ac9ee01e3b83a842ded1b620231a",
+      "size": 220624033
     },
     "server-linux-x64-web": {
-      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.59/hucode-server-linux-x64-web.zip",
-      "sha256": "26695ea0655637d4aa394d79b32c9a1afe78e4afd2eb37b7cc9c1601306f230c",
-      "size": 224905620
+      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.60/hucode-server-linux-x64-web.zip",
+      "sha256": "4929a961e924f2a438154b2103e2124fc1a235a03136407da34fefeaf7a50da5",
+      "size": 224917778
     },
     "server-win32-arm64-web": {
-      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.59/hucode-server-win32-arm64-web.zip",
-      "sha256": "6d56c2539b72b8bb74794c74b6c2dc33b92ec8db1b9d1f8794b5d24b169a5ea7",
-      "size": 191923190
+      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.60/hucode-server-win32-arm64-web.zip",
+      "sha256": "f374de539e273ef3e75838a743c3ad681ab5f4f525ea2510bfa74abdf415e80d",
+      "size": 191903095
     },
     "server-win32-x64-web": {
-      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.59/hucode-server-win32-x64-web.zip",
-      "sha256": "52f3d45eacb7b6b3d4414bdf90129b8f9509680db26f2be9d60c81174ac2ef71",
-      "size": 200549484
+      "url": "https://github.com/jimeh/hucode/releases/download/v0.0.60/hucode-server-win32-x64-web.zip",
+      "sha256": "06450409b48cb00f9a7bc36fcf1998f1acbee882b15b1f3e0766ada1bdfd145d",
+      "size": 200572445
     }
   },
-  "tag": "v0.0.59",
-  "version": "0.0.59",
+  "tag": "v0.0.60",
+  "version": "0.0.60",
   "vscodeVersion": "1.130.0"
 }
