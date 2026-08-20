@@ -1,11 +1,11 @@
 {
-  "url": "https://github.com/jimeh/hucode/releases/tag/v0.0.73",
-  "name": "0.0.73",
-  "notes": "ca27cfc73140ed764c8a21fa7e8356647855d8ce",
-  "pub_date": "2026-08-19T14:57:13Z",
-  "version": "ca27cfc73140ed764c8a21fa7e8356647855d8ce",
-  "productVersion": "1.133.0",
-  "hucodeVersion": "0.0.73",
-  "timestamp": 1787151433000,
-  "sha256hash": "97ff82e40948ac5dba6a7ca2420fea480c31ffb91193772bdfac47211c88ffb8"
+  "url": "https://github.com/jimeh/hucode/releases/tag/v0.0.74",
+  "name": "0.0.74",
+  "notes": "b566ffb85ffbcfc8b7caa43b6235881b63f30543",
+  "pub_date": "2026-08-20T02:19:08Z",
+  "version": "b566ffb85ffbcfc8b7caa43b6235881b63f30543",
+  "productVersion": "1.135.0",
+  "hucodeVersion": "0.0.74",
+  "timestamp": 1787192348000,
+  "sha256hash": "c4cdcfa5b12d52edebbc353a1d66ba00612cb631947a52751289bc842b2e93aa"
 }
