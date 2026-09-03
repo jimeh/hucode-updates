@@ -1,11 +1,11 @@
 {
-  "url": "https://github.com/jimeh/hucode/releases/download/v0.0.78/hucode-darwin-arm64.zip",
-  "name": "0.0.78",
-  "notes": "f2188e0c9021a077e39caee609933ccec35b1d6f",
-  "pub_date": "2026-08-27T11:02:44Z",
-  "version": "f2188e0c9021a077e39caee609933ccec35b1d6f",
-  "productVersion": "1.135.0",
-  "hucodeVersion": "0.0.78",
-  "timestamp": 1787828564000,
-  "sha256hash": "790cf1bca1af6d1d6ec5dc5006f53c3c0a122d4066dddcf7a84570111b7469aa"
+  "url": "https://github.com/jimeh/hucode/releases/download/v0.0.79/hucode-darwin-arm64.zip",
+  "name": "0.0.79",
+  "notes": "8ec031a1919e72a44f77fe9bd9ad17dbc7864be0",
+  "pub_date": "2026-09-03T13:21:59Z",
+  "version": "8ec031a1919e72a44f77fe9bd9ad17dbc7864be0",
+  "productVersion": "1.136.0",
+  "hucodeVersion": "0.0.79",
+  "timestamp": 1788441719000,
+  "sha256hash": "8defa4d44bffc1bc7bf1f055ddce88237ab3f53719557661112b27f755f80460"
 }
