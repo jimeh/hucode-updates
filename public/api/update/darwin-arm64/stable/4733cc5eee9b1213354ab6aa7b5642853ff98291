@@ -1,0 +1,11 @@
+{
+  "url": "https://github.com/jimeh/hucode/releases/download/v0.0.96/hucode-darwin-arm64.zip",
+  "name": "0.0.96",
+  "notes": "52f04438286db2d1702a1897ac23ad8dfca8ad7e",
+  "pub_date": "2026-10-25T07:00:02Z",
+  "version": "52f04438286db2d1702a1897ac23ad8dfca8ad7e",
+  "productVersion": "1.143.1",
+  "hucodeVersion": "0.0.96",
+  "timestamp": 1792911602000,
+  "sha256hash": "59bac2104ede62cf8eaaa7a99e8f4a4933c90a3f8b5a41ec071076ba881a466f"
+}
